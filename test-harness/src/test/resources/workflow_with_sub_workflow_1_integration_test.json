@@ -53,6 +53,5 @@
   "restartable": true,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "ALERT_ONLY",
-  "timeoutSeconds": 0,
-  "ownerEmail": "test@harness.com"
+  "timeoutSeconds": 0
 }
