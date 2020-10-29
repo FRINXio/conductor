@@ -2,19 +2,19 @@
   font-family: 'Source Sans Pro';
   font-style: normal;
   font-weight: 300;
-  src: local('Source Sans Pro Light'), local('SourceSansPro-Light'), url('../fonts/sourcesanspro-light.woff') format('woff');
+  src: local('Source Sans Pro Light'), local('SourceSansPro-Light'), url('../fonts/sourcesanspro-light.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Source Sans Pro';
   font-style: normal;
   font-weight: 400;
-  src: local('Source Sans Pro'), local('SourceSansPro-Regular');
+  src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url('../fonts/sourcesanspro.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Source Sans Pro';
   font-style: normal;
   font-weight: 700;
-  src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold');
+  src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url('../fonts/sourcesanspro-bold.woff2') format('woff2');
 }
 
 *, *:before, *:after {
@@ -47,87 +47,6 @@ body {
   padding: 0;
   height: 100%;
 }
-
-.cronanim-enter {
-  opacity: 0.01;
-  transform: translateY(-20px);
-}
-
-.cronanim-enter.cronanim-enter-active {
-  opacity: 1;
-  transform: translateY(0px);
-  transition: all 300ms ease-in;
-}
-
-.cronanim-leave {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.cronanim-leave.cronanim-leave-active {
-  opacity: 0.00;
-  transform: translateY(-20px);
-  transition: all 100ms ease-in;
-}
-
-.pulse-button {
-  position: relative;
-  top: 50%;
-  left: 50%;
-  margin-left: -50px;
-  margin-top: -50px;
-  display: block;
-  width: 100px;
-  height: 100px;
-  font-size: 1.3em;
-  font-weight: light;
-  font-family: 'Trebuchet MS', sans-serif;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 100px;
-  letter-spacing: -1px;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  background: #5a99d4;
-  cursor: pointer;
-  box-shadow: 0 0 0 0 rgba(#5a99d4, .5);
-  -webkit-animation: pulse 1.5s 2;
-}
-
-@-webkit-keyframes pulse {
-  0% {
-  @include transform(scale(.9));
-  }
-  70% {
-  @include transform(scale(1));
-    box-shadow: 0 0 0 50px rgba(#5a99d4, 0);
-  }
-  100% {
-  @include transform(scale(.9));
-    box-shadow: 0 0 0 0 rgba(#5a99d4, 0);
-  }
-}
-
-.btn-circle.btn-xl {
-  width: 70px;
-  height: 70px;
-  padding: 10px 16px;
-  border-radius: 35px;
-  font-size: 24px;
-  line-height: 1.33;
-}
-
-.btn-circle {
-  width: 30px;
-  height: 30px;
-  padding: 6px 0px;
-  border-radius: 15px;
-  text-align: center;
-  font-size: 12px;
-  line-height: 1.42857;
-}
-
 .ui-content {
   padding: 0px 0px 0px 10px;
 }
@@ -266,7 +185,7 @@ body {
   padding: 0.8em;
 }
 
-.bm-item-list a:link, a:visited  {
+.bm-item-list a:link, .bm-item-list a:visited  {
   color: #b8b7ad;
   padding: 0.8em;
   text-decoration: none;
@@ -293,7 +212,6 @@ body {
   max-width: 69em;
   margin: 0 auto;
   margin-top:10px;
-  background: transparent;
 }
 
 .button-pill {
@@ -402,11 +320,6 @@ pre {
   word-break: break-all;
 }
 
-.editingPre {
-  border: 1px solid#aeb7ff;
-  background-color: #f6f7ff;
-}
-
 .blue {
   color: navy;
 }
@@ -469,7 +382,6 @@ iframe {
 }
 a:hover {
   text-decoration: none;
-  cursor: pointer;
 }
 
 
@@ -538,7 +450,7 @@ a:hover {
   color: #ffffff;
   font-size: 1.2em;
   line-height: 50px;
-  padding: 5px 20px;
+  padding: 5px 0 5px 20px;
   text-decoration: none;
   xborder-right: 1px solid #ccc;
   xbox-shadow: 0 0 5px #1fa67a;
@@ -582,8 +494,18 @@ a:hover {
   cursor: pointer;
 }
 
-.menuList {
-  margin-top: 70px;
+.user-text {
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255, 255, 255, 255);
+  font-size: 0.9em;
+  letter-spacing: 1px;
+}
+.user-text i {
+  margin-right: 10px;
+}
+.user-text a {
+  color: #41a0f3 !important;
 }
 
 .menuHeader {
@@ -636,21 +558,6 @@ a:hover {
   position: fixed;
   overflow: hidden;
   box-shadow: 0px 0px 5px #234665;
-}
-
-.input-form {
-  width: 800px;
-  margin-top: 20px;
-  margin-left: 20px;
-}
-
-.input-grid {
-  margin-left: -15px;
-  margin-right: -15px;
-}
-
-.input-grid .input {
-  text-align: center;
 }
 
 .menu-bars {
@@ -795,75 +702,4 @@ table tbody {
 }
 .red {
   color: red;
-}
-
-.btn-unescape-med {
-  margin-left: 5px;
-}
-
-#jsonedit {
-  width: 100%;
-  height: 100%;
-}
-
-#json-modified-info  {
-  float: right;
-  top: 50px;
-  position: relative;
-  right: 20px;
-  color: darkred;
-}
-
-.editable-string {
-  cursor: pointer;
-}
-
-.popup {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  background-color: rgba(0,0,0, 0.5);
-}
-
-.popup-inner {
-  position: absolute;
-  left: 25%;
-  right: 25%;
-  top: 25%;
-  bottom: 25%;
-  margin: auto;
-  background: white;
-  border-radius: 2px;
-}
-
-.popup-content {
-  width: 100%;
-  height: calc(100% - 40px);
-  padding: 5px;
-}
-
-#popup-editable-content {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-}
-
-.popup-actions {
-  width: 100%;
-  height: 40px;
-}
-
-.loading {
-  position:absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color:#efefef;
-  padding:10px;
-  border: 1px solid #dddddd;
 }

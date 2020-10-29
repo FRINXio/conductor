@@ -1,4 +1,8 @@
+#
+# conductor:ui - Netflix conductor UI
+#
 FROM node:9-alpine
+MAINTAINER Netflix OSS <conductor@netflix.com>
 
 # Install the required packages for the node build
 # to run on alpine
@@ -30,6 +34,7 @@ RUN chmod +x /app/startup.sh
 
 # Get and install conductor UI
 RUN cd /app/ui \
+  && rm package-lock.json \
   && npm install \
   && npm run build --server
 

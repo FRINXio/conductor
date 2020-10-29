@@ -1,6 +1,5 @@
-import React, {Component} from 'react';
-import {OverlayTrigger, Button, Popover, Panel, Table, Input, Well, Label} from 'react-bootstrap';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import React from 'react';
+import {OverlayTrigger, Button, Popover, Panel, Table} from 'react-bootstrap';
 import {connect} from 'react-redux';
 import {Link} from 'react-router'
 import {getWorkflowDetails} from '../../../actions/WorkflowActions';
@@ -12,8 +11,6 @@ import Clipboard from 'clipboard';
 import map from "lodash/fp/map";
 import Tab from "../../common/Tab";
 import TabContainer from "../../common/TabContainer";
-import { startWorkflow } from '../../../actions/WorkflowActions';
-import UnescapeButton from '../../common/UnescapeButton'
 
 new Clipboard('.btn');
 
@@ -50,15 +47,15 @@ function workerLink(type, cell) {
 }
 
 function popoverLink(cell, row) {
-    return (<OverlayTrigger trigger="click" rootClose={true} placement="left" overlay={
+    return (<OverlayTrigger trigger="click" rootClose placement="left" overlay={
         <Popover id="task-details-wfd" title="Task Details" style={{width: '800px'}}>
             <Panel header={<span><span>Task Input</span> <i title="copy to clipboard" className="btn fa fa-clipboard"
-                                                            data-clipboard-target="#input"/><UnescapeButton target='input' /></span>}>
+                                                            data-clipboard-target="#input"/></span>}>
 
                 <span className="small"><pre id="input">{JSON.stringify(row.inputData, null, 2)}</pre></span>
             </Panel>
             <Panel header={<span><span>Task Output</span> <i title="copy to clipboard" className="btn fa fa-clipboard"
-                                                             data-clipboard-target="#output"/><UnescapeButton target='output' /></span>}>
+                                                             data-clipboard-target="#output"/></span>}>
                 <span className="small"><pre id="output">{JSON.stringify(row.outputData, null, 2)}</pre></span>
             </Panel>
             <Panel header="Task Failure Reason (if any)">
@@ -99,43 +96,18 @@ function showFailure(wf) {
     return 'none';
 }
 
-class WorkflowDetails extends Component {
+class WorkflowDetails extends React.Component {
     constructor(props) {
         super(props);
-
-        this.reloadPage = this.reloadPage.bind(this);
-        this.handleCheck = this.handleCheck.bind(this);
-
-        this.reloadTimeoutObject;
-
-        this.state = {
-            loading: this.props.starting,
-            log: this.props.res,
-            jsonData: null,
-            show: false,
-            workflowForm: {
-                labels: [],
-                values: []
-            },
-            checked: false
-        };
-
         http.get('/api/sys/').then((data) => {
             window.sys = data.sys;
         });
     }
 
     componentWillReceiveProps(nextProps) {
-        this.getObject(nextProps.data);
         if (this.props.hash !== nextProps.hash) {
             this.props.dispatch(getWorkflowDetails(nextProps.params.workflowId));
-            this.setState({show: false});
         }
-
-        this.setState({
-            loading: nextProps.starting,
-            log: nextProps.res,
-        });
     }
 
     shouldComponentUpdate(nextProps) {
@@ -152,103 +124,7 @@ class WorkflowDetails extends Component {
       })
     }
 
-    startWorkflow1(e) {
-
-        e.preventDefault();
-        let wfname = this.props.meta.name;
-        let data = {
-            json: this.state.jsonData
-        };
-
-        console.log(JSON.stringify(data, null, 2));
-
-        this.props.dispatch(startWorkflow(wfname, data));
-
-        this.setState({ show: true });
-
-    }
-
-    componentWillUnmount(){
-        clearTimeout(this.reloadTimeoutObject);
-    }
-
-    getObject(wf) {
-        let inputObject;
-
-        if(!wf.input){
-            inputObject = {};
-        } else {
-            inputObject = wf.input;
-        }
-
-        let labels = [];
-        let values = [];
-        let index = 0;
-
-        if (wf) {
-
-            for (let key in inputObject) {
-                labels[index] = key;
-                if (typeof inputObject[key] === 'object') {
-                    values[index] = JSON.stringify(inputObject[key]);
-                } else
-                    values[index] = inputObject[key];
-
-                index++;
-            }
-
-            if (!this.state.jsonData || _.isEmpty(this.state.jsonData)) {
-                this.state.jsonData = inputObject;
-            }
-            this.state.workflowForm.labels = labels;
-            this.state.workflowForm.values = values;
-        }
-
-    }
-
-    handleChange(idx, e) {
-
-        let dataObject = {};
-        let { labels, values } = this.state.workflowForm;
-
-        values.splice(idx, 1, e.target.value);
-
-        for (let i = 0; i < labels.length; i++) {
-            if (values[i] && values[i].startsWith("{")) {
-                dataObject[labels[i]] = JSON.parse(values[i]);
-            } else if (values[i])
-                dataObject[labels[i]] = values[i];
-        }
-        this.state.jsonData = dataObject;
-    }
-
-    reloadPage() {
-        this.props.dispatch(getWorkflowDetails(this.props.params.workflowId));
-    }
-
-    handleCheck() {
-        let newv = !this.state.checked;
-        this.setState({
-            checked: newv
-        });
-        if(newv) {
-            //console.log("set interval")
-            this.reloadTimeoutObject = setInterval(() => {
-                if(this.state.checked){
-                    this.props.dispatch(getWorkflowDetails(this.props.params.workflowId));
-                }
-            }, 3000);
-        } else {
-            //console.log("clear")
-            clearTimeout(this.reloadTimeoutObject);
-        }
-    }
-
     render() {
-
-        const { labels, values } = this.state.workflowForm;
-        const { log, show } = this.state;
-
         let wf = this.props.data;
         if (wf == null) {
             wf = {};
@@ -266,36 +142,6 @@ class WorkflowDetails extends Component {
             parentWorkflowButton = <Link to={"/workflow/id/" + wf.parentWorkflowId}><Button bsStyle="default" bsSize="xsmall">
               Parent
             </Button></Link>;
-        }
-
-        function consoleLog() {
-            if(show) {
-                if (log) {
-                    if (log.status === 200) {
-                        return (
-                            <div>
-                                <Well>
-                                <span><h4>Workflow ID:</h4><Link
-                                    to={`/workflow/id/${log.text}`}>{log.text}</Link><br/></span>
-                                    <span><h4>Status code: </h4> <Label
-                                        bsStyle="success">{log.status}</Label><br/></span>
-                                    <span><h4>Status text: </h4> <Label
-                                        bsStyle="success">{log.text}</Label><br/></span>
-                                </Well>
-                            </div>
-                        );
-                    }
-                    else {
-                        return (
-                            <div>
-                                <Well>
-                                    <span><h4>Error: </h4> <Label bsStyle="danger">{log.toString()}</Label><br/></span>
-                                </Well>
-                            </div>
-                        )
-                    }
-                }
-            }
         }
 
         return (
@@ -338,7 +184,6 @@ class WorkflowDetails extends Component {
 
                 <TabContainer>
                     <Tab eventKey={1} title="Execution Flow">
-                        <div style={{marginTop: 10}}><button className={'btn btn-default'} style={{display: 'inline-block', marginRight: 10}} disabled={this.state.checked} onClick={() => {this.reloadPage()}}>Reload diagram</button><input type="checkbox" onChange={this.handleCheck} /> Auto-reload every <input type="number" min="0" style={{width: 45}} defaultValue={3}/> seconds</div>
                         <WorkflowMetaDia meta={this.props.meta} wfe={wf} subworkflows={this.props.subworkflows}/>
                     </Tab>
                     <Tab eventKey={2} title="Task Details">
@@ -365,11 +210,9 @@ class WorkflowDetails extends Component {
                         <div>
                             <strong>Workflow Input <i title="copy to clipboard" className="btn fa fa-clipboard"
                                                       data-clipboard-target="#wfinput"/></strong>
-                                                      <UnescapeButton target='wfinput' />
-                            <pre style={{height: '200px'}} id="wfinput">{this.state.unescapeInput ? unescapeJs(JSON.stringify(wf.input, null, 3)) : JSON.stringify(wf.input, null, 3)}</pre>
+                            <pre style={{height: '200px'}} id="wfinput">{JSON.stringify(wf.input, null, 3)}</pre>
                             <strong>Workflow Output <i title="copy to clipboard" className="btn fa fa-clipboard"
                                                        data-clipboard-target="#wfoutput"/></strong>
-                                                       <UnescapeButton target='wfoutput' />
                             <pre style={{height: '200px'}}
                                  id="wfoutput">{JSON.stringify(wf.output == null ? {} : wf.output, null, 3)}</pre>
                             {wf.status === 'FAILED' ? <div><strong>Workflow Failure Reason (if any)</strong>
@@ -380,40 +223,7 @@ class WorkflowDetails extends Component {
                     <Tab eventKey={4} title="JSON">
                         <i title="copy to clipboard" className="btn fa fa-clipboard"
                            data-clipboard-target="#fulljson"/>
-                           <UnescapeButton target='fulljson' />
                         <pre style={{height: '80%'}} id="fulljson">{JSON.stringify(wf, null, 3)}</pre>
-                    </Tab>
-                    <Tab eventKey={5} title="Edit input">
-                        &nbsp;&nbsp;
-
-                        <div className="input-form">
-                            <Panel header="Rerun workflow">
-                                <h1>Inputs of <Label
-                                    bsStyle={log ? (log.error ? "danger" : "success") : "info"}>{this.props.meta ? this.props.meta.name : ""}</Label> workflow
-                                </h1>
-                                {labels.map((item, idx) =>
-                                    <form onSubmit={!this.state.loading ? this.startWorkflow1.bind(this): null}>
-                                        &nbsp;&nbsp;
-                                        <Input type="input" key={values}
-                                               label={item}
-                                               defaultValue={values[idx]}
-                                               placeholder="Enter the input"
-                                               onChange={this.handleChange.bind(this, idx)}/>
-                                        &nbsp;&nbsp;
-                                    </form>)}
-
-                                <Button bsStyle="primary" bsSize="large" disabled={this.state.loading}
-                                        onClick={!this.state.loading ? this.startWorkflow1.bind(this) : null }>
-                                        <i className="fas fa-redo"/>
-                                        &nbsp;&nbsp;Rerun workflow
-                                </Button>
-
-                                <h3>Console log</h3>
-                                {consoleLog()}
-
-                            </Panel>
-                        </div>
-
                     </Tab>
                 </TabContainer>
             </div>

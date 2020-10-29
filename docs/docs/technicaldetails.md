@@ -84,7 +84,7 @@ Dyno queues are the default queuing mechanism of conductor.
 
 Queues are allocated and used for:
 * Task execution - each task type gets a queue
-* Workflow execution - single queue with all currently executed workflows (deciderQueue)
+* Workflow execution - single queue with all currently executing workflows (deciderQueue)
   * This queue is used by SweeperService
 
 **Each conductor server instance gets its own set of queues**. Or more precisely a queue shard of its own.
@@ -113,7 +113,7 @@ LAMBDA task execution -> conductor_queues.test.QUEUE.LAMBDA.c
 
 Which means that SweeperService in conductor instance #1 is responsible for sweeping the workflow, conductor #2 is responsible for executing HTTP task and conductor #1 again responsible for executing LAMBDA task.
 
-This illustrates the race condition: If the HTTP task completion in instance #2 happens at the same time as sweep in instance #1 ..
+This illustrates the race condition: If the HTTP task completion in instance #2 happens at the same time as sweep in instance #1 ... you can end up with 2 different updates to a workflow execution: one update timing workflow out while the other completing the task and scheduling next.
 
 > The round-robin strategy responsible for work distribution is defined [here](https://github.com/Netflix/dyno-queues/blob/1cde55bbb69acd631c671a0cb2f9db2419163e33/dyno-queues-redis/src/main/java/com/netflix/dyno/queues/redis/sharding/RoundRobinStrategy.java)
 

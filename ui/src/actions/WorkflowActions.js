@@ -68,46 +68,6 @@ export function restartWorfklow(workflowId, withLatestVersion){
   }
 }
 
-export function startWorkflow(workflowName, data){
-  return function (dispatch) {
-    dispatch({
-      type: 'REQUESTED_START_WORKFLOW',
-      workflowName,
-      data
-    });
-
-
-    return http.post('/api/wfe/workflow/' + workflowName, data).then((data) => {
-      dispatch({
-        type: 'RECEIVED_START_WORKFLOW',
-        data: data
-      });
-    }).catch((e) => {
-      dispatch({
-        type: 'REQUEST_ERROR',
-        e
-      });
-    });
-  }
-}
-
-export function getCronData(){
-    return function (dispatch) {
-        dispatch({
-            type: 'REQUESTED_CRON_DATA'
-        });
-
-
-        return http.get('/api/wfe/crondata').then((data) => {
-            dispatch({
-                type: 'RECEIVED_CRON_DATA',
-                data: data
-            });
-        }).catch((e) => {
-         });
-    }
-}
-
 export function retryWorfklow(workflowId){
   return function (dispatch) {
     dispatch({
@@ -264,26 +224,6 @@ export function getQueueData() {
   }
 }
 
-export function updateWorkflow(workflow){
-    return function (dispatch) {
-        dispatch({
-            type: 'REQUESTED_UPDATE_WORKFLOW_DEF',
-            workflow
-        });
-
-
-        return http.put('/api/wfe/metadata/', workflow).then((data) => {
-            dispatch({
-                type: 'RECEIVED_UPDATE_WORKFLOW_DEF'
-            });
-        }).catch((e) => {
-            dispatch({
-                type: 'REQUEST_ERROR',
-                e
-            });
-        });
-    }
-}
 
 export function getEventHandlers() {
 
@@ -297,50 +237,6 @@ export function getEventHandlers() {
       dispatch({
         type: 'RECEIVED_LIST_EVENT_HANDLERS',
         events : data
-      });
-    }).catch((e) => {
-      dispatch({
-        type: 'REQUEST_ERROR',
-        e
-      });
-    });
-  }
-}
-
-export function getEvents(event, time, query) {
-
-  return function (dispatch) {
-    dispatch({
-      type: 'LIST_EVENT'
-    });
-
-
-    return http.get('/api/events/executions').then((data) => {
-      dispatch({
-        type: 'RECEIVED_LIST_EVENT',
-        events : data
-      });
-    }).catch((e) => {
-      dispatch({
-        type: 'REQUEST_ERROR',
-        e
-      });
-    });
-  }
-}
-
-export function getTaskLogs(taskId) {
-
-  return function (dispatch) {
-    dispatch({
-      type: 'GET_TASK_LOGS'
-    });
-
-
-    return http.get('/api/wfe/task/log' + taskId).then((data) => {
-      dispatch({
-        type: 'RECEIVED_GET_TASK_LOGS',
-        logs : data
       });
     }).catch((e) => {
       dispatch({

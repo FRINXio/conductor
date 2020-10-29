@@ -13,6 +13,15 @@ function getUrl(path) {
     : `http://127.0.0.1:${global.server.get('port')}${path}`;
 }
 
+const handleUnauthenticated = err => {
+  if (err && err.status === 401 && err.response.header["www-authenticate"]) {
+    const loginPath = err.response.header["location"];
+    if (loginPath) {
+      window.location = loginPath + location.hash;
+    }
+  }
+}
+
 const HttpClient = {
   get: (path, token) =>
     new Promise((resolve, reject) => {
@@ -22,6 +31,7 @@ const HttpClient = {
       }
       req.end((err, res) => {
         if (err) {
+          handleUnauthenticated(err);
           reject(err);
         } else {
           resolve(res.body);
@@ -30,14 +40,14 @@ const HttpClient = {
     }),
   post: (path, data, token) =>
     new Promise((resolve, reject) => {
-      const req = request.post(path, data)
-          .set('Content-Type', 'application/json');
+      const req = request.post(path, data).set('Accept', 'application/json');
       if (token) {
         req.set('Authorization', token);
       }
       req.end((err, res) => {
         if (err || !res.ok) {
           console.error('Error on post! ' + res);
+          handleUnauthenticated(err);
           reject(err);
         } else {
           if (res.body) {
@@ -57,6 +67,7 @@ const HttpClient = {
       req.end((err, res) => {
         if (err || !res.ok) {
           console.error('Error on post! ' + res);
+          handleUnauthenticated(err);
           reject(err);
         } else {
           resolve(res.body);
@@ -72,6 +83,7 @@ const HttpClient = {
       req.end((err, res) => {
         if (err || !res.ok) {
           console.error('Error on post! ' + err);
+          handleUnauthenticated(err);
           reject(err);
         } else {
           resolve(res.body);

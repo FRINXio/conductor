@@ -24,22 +24,19 @@ import com.netflix.dyno.queues.Message;
 import com.netflix.dyno.queues.ShardSupplier;
 import com.netflix.dyno.queues.redis.RedisDynoQueue;
 import com.netflix.dyno.queues.redis.RedisQueues;
-import com.netflix.dyno.queues.redis.sharding.RoundRobinStrategy;
-import com.netflix.dyno.queues.redis.sharding.ShardingStrategy;
 import com.netflix.dyno.queues.shard.DynoShardSupplier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import redis.clients.jedis.JedisCommands;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.commands.JedisCommands;
 
 @Singleton
 public class DynoQueueDAO implements QueueDAO {
@@ -92,8 +89,18 @@ public class DynoQueueDAO implements QueueDAO {
             }
         };
 
-        this.dynoClientRead = new DynoJedisClient.Builder().withApplicationName(config.getAppId()).withDynomiteClusterName(cluster).withHostSupplier(hostSupplier).isDatastoreClient(true).build();
-        DynoJedisClient dyno = new DynoJedisClient.Builder().withApplicationName(config.getAppId()).withDynomiteClusterName(cluster).withDiscoveryClient(dc).build();
+        this.dynoClientRead = new DynoJedisClient.Builder()
+            .withApplicationName(config.getAppId())
+            .withDynomiteClusterName(cluster)
+            .withHostSupplier(hostSupplier)
+            .withConnectionPoolConsistency("DC_ONE")
+            .build();
+
+        DynoJedisClient dyno = new DynoJedisClient.Builder()
+            .withApplicationName(config.getAppId())
+            .withDynomiteClusterName(cluster)
+            .withDiscoveryClient(dc)
+            .build();
 
         this.dynoClient = dyno;
 
@@ -243,15 +250,16 @@ public class DynoQueueDAO implements QueueDAO {
     }
 
     @Override
-    public boolean setOffsetTime(String queueName, String id, long offsetTimeInSecond) {
+    public boolean resetOffsetTime(String queueName, String id) {
         DynoQueue queue = queues.get(queueName);
-        return queue.setTimeout(id, offsetTimeInSecond);
+        return queue.setTimeout(id, 0);
 
     }
 
-	@Override
-	public boolean exists(String queueName, String id) {
-		DynoQueue queue = queues.get(queueName);
-		return Optional.ofNullable(queue.get(id)).isPresent();
-	}
+    @Override
+    public boolean containsMessage(String queueName, String messageId) {
+        DynoQueue queue = queues.get(queueName);
+        Message message = queue.get(messageId);
+        return Objects.nonNull(message);
+    }
 }

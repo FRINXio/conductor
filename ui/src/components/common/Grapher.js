@@ -3,7 +3,7 @@ import dagreD3 from 'dagre-d3'
 import d3 from 'd3'
 import {Tabs, Tab, Table} from 'react-bootstrap';
 import Clipboard from 'clipboard';
-import UnescapeButton from './UnescapeButton'
+import { Link } from 'react-router';
 
 new Clipboard('.btn');
 
@@ -112,8 +112,8 @@ class Grapher extends Component {
             g.setNode(v.ref, {
                 label: l,
                 shape: v.shape,
-                style: v.style + ';cursor: pointer;',
-                labelStyle: v.labelStyle + '; font-weight:normal; font-size: 11px; cursor: pointer;'
+                style: v.style,
+                labelStyle: v.labelStyle + '; font-weight:normal; font-size: 11px'
             });
         }
 
@@ -200,9 +200,18 @@ class Grapher extends Component {
                 <div className="right-prop-overlay" ref={this.setPropsDivRef}
                      style={{overflowX: 'scroll', display: this.state.showSideBar ? '' : 'none', padding: '5px 5px 10px 10px'}}>
                     <h4 className="propsheader">
-                        <i className="far fa-times-circle fa-1x close-btn" onClick={hideProps}/>
+                        <i className="fa fa-close fa-1x close-btn" onClick={hideProps}/>
                         {this.state.selectedTask.taskType} ({this.state.selectedTask.status})
                     </h4>
+                    {this.state.selectedTask.taskType == 'SUB_WORKFLOW' &&
+                        <div>
+                            <p>
+                            <Link onClick={hideProps} to={'/workflow/id/' + this.state.selectedTask.subWorkflowId}>
+                                <u>View Subworkflow</u>
+                            </Link>
+                            </p>
+                        </div>
+                    }
                     <div style={{
                         color: '#ff0000',
                         display: this.state.selectedTask.status === 'FAILED' ? '' : 'none'
@@ -224,7 +233,7 @@ class Grapher extends Component {
                                 </tr>
                                 <tr>
                                     <th colSpan="4">Input <i title="copy to clipboard" className="btn fa fa-clipboard"
-                                                             data-clipboard-target="#t_input"/><UnescapeButton target="t_input" /></th>
+                                                             data-clipboard-target="#t_input"/></th>
                                 </tr>
                                 <tr>
                                     <td colSpan="4">
@@ -234,7 +243,7 @@ class Grapher extends Component {
                                 </tr>
                                 <tr>
                                     <th colSpan="4">Output <i title="copy to clipboard" className="btn fa fa-clipboard"
-                                                              data-clipboard-target="#t_output"/><UnescapeButton target="t_output" /></th>
+                                                              data-clipboard-target="#t_output"/></th>
                                 </tr>
                                 <tr>
                                     <td colSpan="4" >
@@ -247,12 +256,12 @@ class Grapher extends Component {
                         </Tab>
                         <Tab eventKey={2} title="JSON"><br/>
                             <i title="copy to clipboard" className="btn fa fa-clipboard"
-                               data-clipboard-target="#t_json"/><UnescapeButton target="t_json" />
+                               data-clipboard-target="#t_json"/>
                             <pre id="t_json">{JSON.stringify(this.state.selectedTask, null, 3)}</pre>
                         </Tab>
                         <Tab eventKey={3} title="Logs"><br/>
                             <i title="copy to clipboard" className="btn fa fa-clipboard"
-                               data-clipboard-target="#t_logs"/><UnescapeButton target="t_logs" />
+                               data-clipboard-target="#t_logs"/>
                             <pre id="t_logs">{JSON.stringify(this.state.selectedTask.logs, null, 3)}</pre>
                         </Tab>
                     </Tabs>

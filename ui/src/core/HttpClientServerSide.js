@@ -30,7 +30,7 @@ const HttpClient = {
     }),
   post: (path, data, token) =>
     new Promise((resolve, reject) => {
-      const req = request.post(path, data).set('Content-Type', 'application/json');
+      const req = request.post(path, data).set('Accept', 'application/json');
       if (token) {
         req.set('Authorization', token);
       }
@@ -39,7 +39,9 @@ const HttpClient = {
           console.error('Error on post! ' + res);
           reject(err);
         } else {
-          if (res) {
+          if (res.body) {
+            resolve(res.body);
+          } else {
             resolve(res);
           }
         }

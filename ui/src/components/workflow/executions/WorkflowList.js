@@ -8,7 +8,7 @@ import {changeSearch, fetchSearchResults} from '../../../actions/search';
 import { performBulkOperation } from '../../../actions/bulk';
 import WorkflowSearch from "./WorkflowSearch";
 import WorkflowTable from './WorkflowTable';
-import request from 'superagent';
+
 import difference from 'lodash/difference';
 import filter from "lodash/filter";
 import get from "lodash/get";
@@ -28,7 +28,6 @@ class Workflow extends Component {
 
     this.nextPage = this.nextPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
-    this.waitForDel = this.waitForDel.bind(this);
 
     this.bulkProcess = this.bulkProcess.bind(this);
     this.onChangeBulkProcessSelection = this.onChangeBulkProcessSelection.bind(this);
@@ -125,53 +124,6 @@ class Workflow extends Component {
 
     return false;
   }
-
-    waitForDel() {
-
-        let count = this.state.count;
-        let filteredWfsLength = this.state.filteredWfsLength;
-        var _this = this;
-
-        console.log(filteredWfsLength);
-        console.log(count);
-
-        if (count === filteredWfsLength) {
-            console.log("all deleted");
-            window.location.reload();
-        } else {
-            console.log("waiting");
-            setTimeout(function () {
-                _this.waitForDel()
-            }, 250);
-        }
-    }
-
-    deleteWorkflows(filteredWfs) {
-        var self = this;
-        this.setState({
-            loading: true,
-            filteredWfsLength: filteredWfs.length,
-            count: 0
-        });
-        if (filteredWfs) {
-            for (var i = 0; i < filteredWfs.length; i++) {
-                let workflowId = filteredWfs[i].workflowId;
-                request
-                    .delete('/api/wfe/workflow/' + workflowId)
-                    .query('archiveWorkflow=false')
-                    .set('Accept', 'application/json')
-                    .send({workflowId})
-                    .end(function (err, res) {
-                        if (res) {
-                            self.setState({count: self.state.count + 1})
-                        }
-                    })
-            }
-        }
-        console.log(this.state.filteredWfsLength);
-        console.log("count: " + this.state.count);
-        this.waitForDel();
-    }
 
  render() {
     const {location, history, bulk, metadata, search} = this.props;

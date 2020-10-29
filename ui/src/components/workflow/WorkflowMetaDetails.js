@@ -1,27 +1,17 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router';
-import { Breadcrumb, BreadcrumbItem, Grid, Row, Col, Well, OverlayTrigger,Button,Popover, Panel, Tabs, Tab } from 'react-bootstrap';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import React from 'react';
+import { Tabs, Tab } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import { getWorkflowMetaDetails, updateWorkflow } from '../../actions/WorkflowActions';
-import WorkflowMetaDia from './WorkflowMetaDia';
-import WorkflowMetaInput from './WorkflowMetaInput';
-import { getInputs, getDetails } from '../../actions/JSONActions';
-import JSONTab from './JSONTab';
+import { getWorkflowMetaDetails } from '../../actions/WorkflowActions';
+import WorkflowMetaDia from './WorkflowMetaDia'
 
-class WorkflowMetaDetails extends Component {
+class WorkflowMetaDetails extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       name : props.params.name,
       version : props.params.version,
-      workflowMeta: {tasks: []},
-      workflowForm: {
-          labels: [],
-          descs: [],
-          values: []
-      }
+      workflowMeta: {tasks: []}
     };
   }
 
@@ -29,26 +19,10 @@ class WorkflowMetaDetails extends Component {
     this.state.name = nextProps.params.name;
     this.state.version = nextProps.params.version;
     this.state.workflowMeta = nextProps.meta;
-    this.getWorkflowInputDetails();
   }
 
   componentWillMount(){
     this.props.dispatch(getWorkflowMetaDetails(this.state.name, this.state.version));
-  }
-
-  getWorkflowInputDetails() {
-      this.setState({
-          workflowForm: {
-              labels: getInputs(this.state.workflowMeta),
-          }
-      }, () => {
-          this.setState({
-              workflowForm: {
-                  labels: this.state.workflowForm.labels,
-                  ...getDetails(this.state.workflowMeta, this.state.workflowForm.labels)
-              }
-          })
-      });
   }
 
   render() {
@@ -56,21 +30,18 @@ class WorkflowMetaDetails extends Component {
     if(wf == null) {
       wf = {tasks: []};
     }
-
     return (
       <div className="ui-content">
         <Tabs>
           <Tab eventKey={1} title="Diagram">
             <div><WorkflowMetaDia meta={wf} tasks={[]}/></div>
           </Tab>
-          <Tab ref={this.JSONTab} eventKey={2} title="JSON">
-            <div><JSONTab wfs={this.state.workflowMeta} name={this.state.name} version={this.state.version} /></div>
-          </Tab>
-          <Tab eventKey={3} title="Input">
-          <div><WorkflowMetaInput workflowForm={this.state.workflowForm} name={this.state.name}/></div>
+          <Tab eventKey={2} title="JSON">
+            <div><pre>
+              {JSON.stringify(this.state.workflowMeta, null, 2)}
+          </pre></div>
           </Tab>
         </Tabs>
-
       </div>
     );
   }

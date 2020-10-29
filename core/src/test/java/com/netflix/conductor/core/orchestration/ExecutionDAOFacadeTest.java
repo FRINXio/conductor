@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Netflix, Inc.
+ * Copyright 2020 Netflix, Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,6 +11,20 @@
  * specific language governing permissions and limitations under the License.
  */
 package com.netflix.conductor.core.orchestration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.amazonaws.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,42 +38,37 @@ import com.netflix.conductor.core.execution.TestConfiguration;
 import com.netflix.conductor.core.execution.TestDeciderService;
 import com.netflix.conductor.dao.ExecutionDAO;
 import com.netflix.conductor.dao.IndexDAO;
-import org.junit.Before;
-import org.junit.Test;
-
+import com.netflix.conductor.dao.PollDataDAO;
+import com.netflix.conductor.dao.QueueDAO;
+import com.netflix.conductor.dao.RateLimitingDAO;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExecutionDAOFacadeTest {
 
     private ExecutionDAO executionDAO;
+    private QueueDAO queueDAO;
     private IndexDAO indexDAO;
     private ObjectMapper objectMapper;
     private ExecutionDAOFacade executionDAOFacade;
+    private RateLimitingDAO rateLimitingDao;
+    private PollDataDAO pollDataDAO;
 
     @Before
     public void setUp() {
         executionDAO = mock(ExecutionDAO.class);
+        queueDAO = mock(QueueDAO.class);
         indexDAO = mock(IndexDAO.class);
+        rateLimitingDao = mock(RateLimitingDAO.class);
+        pollDataDAO = mock(PollDataDAO.class);
         objectMapper = new JsonMapperProvider().get();
         Configuration configuration = new TestConfiguration();
-        executionDAOFacade = new ExecutionDAOFacade(executionDAO, indexDAO, objectMapper, configuration);
+        executionDAOFacade = new ExecutionDAOFacade(executionDAO, queueDAO, indexDAO, rateLimitingDao, pollDataDAO,
+            objectMapper, configuration);
     }
 
     @Test
@@ -82,8 +91,8 @@ public class ExecutionDAOFacadeTest {
     @Test
     public void testGetWorkflowsByCorrelationId() {
         when(executionDAO.canSearchAcrossWorkflows()).thenReturn(true);
-        when(executionDAO.getWorkflowsByCorrelationId(any(), anyBoolean())).thenReturn(Collections.singletonList(new Workflow()));
-        List<Workflow> workflows = executionDAOFacade.getWorkflowsByCorrelationId("correlationId", true);
+        when(executionDAO.getWorkflowsByCorrelationId(any(), any(), anyBoolean())).thenReturn(Collections.singletonList(new Workflow()));
+        List<Workflow> workflows = executionDAOFacade.getWorkflowsByCorrelationId("workflowName", "correlationId", true);
         assertNotNull(workflows);
         assertEquals(1, workflows.size());
         verify(indexDAO, never()).searchWorkflows(anyString(), anyString(), anyInt(), anyInt(), any());
@@ -95,7 +104,7 @@ public class ExecutionDAOFacadeTest {
         searchResult.setResults(workflowIds);
         when(indexDAO.searchWorkflows(anyString(), anyString(), anyInt(), anyInt(), any())).thenReturn(searchResult);
         when(executionDAO.getWorkflow("workflowId", true)).thenReturn(new Workflow());
-        workflows = executionDAOFacade.getWorkflowsByCorrelationId("correlationId", true);
+        workflows = executionDAOFacade.getWorkflowsByCorrelationId("workflowName", "correlationId", true);
         assertNotNull(workflows);
         assertEquals(1, workflows.size());
     }
@@ -107,7 +116,7 @@ public class ExecutionDAOFacadeTest {
         when(executionDAO.getWorkflow(anyString(), anyBoolean())).thenReturn(workflow);
         executionDAOFacade.removeWorkflow("workflowId", false);
         verify(indexDAO, never()).updateWorkflow(any(), any(), any());
-        verify(indexDAO, times(1)).asyncRemoveWorkflow(anyString());
+        verify(indexDAO, times(1)).asyncRemoveWorkflow(workflow.getWorkflowId());
     }
 
     @Test

@@ -28,6 +28,7 @@ import com.netflix.conductor.core.events.EventProcessor;
 import com.netflix.conductor.core.events.EventQueueProvider;
 import com.netflix.conductor.core.events.SimpleActionProcessor;
 import com.netflix.conductor.core.events.SimpleEventProcessor;
+import com.netflix.conductor.core.events.queue.EventPollSchedulerProvider;
 import com.netflix.conductor.core.events.queue.dyno.DynoEventQueueProvider;
 import com.netflix.conductor.core.execution.ParametersUtils;
 import com.netflix.conductor.core.execution.mapper.DecisionTaskMapper;
@@ -46,9 +47,13 @@ import com.netflix.conductor.core.execution.mapper.TaskMapper;
 import com.netflix.conductor.core.execution.mapper.TerminateTaskMapper;
 import com.netflix.conductor.core.execution.mapper.UserDefinedTaskMapper;
 import com.netflix.conductor.core.execution.mapper.WaitTaskMapper;
+import com.netflix.conductor.core.execution.mapper.DoWhileTaskMapper;
+import com.netflix.conductor.core.execution.mapper.JsonJQTransformTaskMapper;
+import com.netflix.conductor.core.execution.mapper.SetVariableTaskMapper;
 import com.netflix.conductor.core.execution.tasks.Event;
 import com.netflix.conductor.core.execution.tasks.IsolatedTaskQueueProducer;
 import com.netflix.conductor.core.execution.tasks.Lambda;
+import com.netflix.conductor.core.execution.tasks.SetVariable;
 import com.netflix.conductor.core.execution.tasks.SubWorkflow;
 import com.netflix.conductor.core.execution.tasks.SystemTaskWorkerCoordinator;
 import com.netflix.conductor.core.execution.tasks.Terminate;
@@ -56,6 +61,7 @@ import com.netflix.conductor.core.execution.tasks.Wait;
 import com.netflix.conductor.core.utils.JsonUtils;
 import com.netflix.conductor.dao.MetadataDAO;
 import com.netflix.conductor.dao.QueueDAO;
+import rx.Scheduler;
 
 import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_DECISION;
 import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_DYNAMIC;
@@ -72,6 +78,9 @@ import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_
 import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_TERMINATE;
 import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_USER_DEFINED;
 import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_WAIT;
+import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_DO_WHILE;
+import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_JSON_JQ_TRANSFORM;
+import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_SET_VARIABLE;
 import static com.netflix.conductor.core.events.EventQueues.EVENT_QUEUE_PROVIDERS_QUALIFIER;
 /**
  * @author Viren
@@ -91,10 +100,11 @@ public class CoreModule extends AbstractModule {
         bind(Lambda.class).asEagerSingleton();
         bind(Terminate.class).asEagerSingleton();
         bind(IsolatedTaskQueueProducer.class).asEagerSingleton();
-
+        bind(SetVariable.class).asEagerSingleton();
         // start processing events when instance starts
         bind(ActionProcessor.class).to(SimpleActionProcessor.class);
         bind(EventProcessor.class).to(SimpleEventProcessor.class).asEagerSingleton();
+        bind(Scheduler.class).toProvider(EventPollSchedulerProvider.class).asEagerSingleton();
     }
 
     @Provides
@@ -113,8 +123,8 @@ public class CoreModule extends AbstractModule {
     @StringMapKey(CONDUCTOR_QUALIFIER)
     @Singleton
     @Named(EVENT_QUEUE_PROVIDERS_QUALIFIER)
-    public EventQueueProvider getDynoEventQueueProvider(QueueDAO queueDAO, Configuration configuration) {
-        return new DynoEventQueueProvider(queueDAO, configuration);
+    public EventQueueProvider getDynoEventQueueProvider(QueueDAO queueDAO, Configuration configuration, Scheduler eventScheduler) {
+        return new DynoEventQueueProvider(queueDAO, configuration, eventScheduler);
     }
 
     @ProvidesIntoMap
@@ -123,6 +133,14 @@ public class CoreModule extends AbstractModule {
     @Named(TASK_MAPPERS_QUALIFIER)
     public TaskMapper getDecisionTaskMapper() {
         return new DecisionTaskMapper();
+    }
+
+    @ProvidesIntoMap
+    @StringMapKey(TASK_TYPE_DO_WHILE)
+    @Singleton
+    @Named(TASK_MAPPERS_QUALIFIER)
+    public TaskMapper getDoWhileTaskMapper(MetadataDAO metadataDAO) {
+        return new DoWhileTaskMapper(metadataDAO);
     }
 
     @ProvidesIntoMap
@@ -210,10 +228,10 @@ public class CoreModule extends AbstractModule {
     @StringMapKey(TASK_TYPE_LAMBDA)
     @Singleton
     @Named(TASK_MAPPERS_QUALIFIER)
-    public TaskMapper getLambdaTaskMapper(ParametersUtils parametersUtils) {
-        return new LambdaTaskMapper(parametersUtils);
+    public TaskMapper getLambdaTaskMapper(ParametersUtils parametersUtils, MetadataDAO metadataDAO) {
+        return new LambdaTaskMapper(parametersUtils, metadataDAO);
     }
-    
+
     @ProvidesIntoMap
     @StringMapKey(TASK_TYPE_EXCLUSIVE_JOIN)
     @Singleton
@@ -238,4 +256,19 @@ public class CoreModule extends AbstractModule {
         return new KafkaPublishTaskMapper(parametersUtils, metadataDAO);
     }
 
+    @ProvidesIntoMap
+    @StringMapKey(TASK_TYPE_JSON_JQ_TRANSFORM)
+    @Singleton
+    @Named(TASK_MAPPERS_QUALIFIER)
+    public TaskMapper getJsonJQTransformTaskMapper(ParametersUtils parametersUtils, MetadataDAO metadataDAO) {
+        return new JsonJQTransformTaskMapper(parametersUtils, metadataDAO);
+    }
+
+    @ProvidesIntoMap
+    @StringMapKey(TASK_TYPE_SET_VARIABLE)
+    @Singleton
+    @Named(TASK_MAPPERS_QUALIFIER)
+    public TaskMapper getSetVariableTaskMapper() {
+        return new SetVariableTaskMapper();
+    }
 }
