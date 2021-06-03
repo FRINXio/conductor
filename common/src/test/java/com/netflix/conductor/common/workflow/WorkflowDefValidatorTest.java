@@ -303,34 +303,34 @@ public class WorkflowDefValidatorTest {
         assertTrue(validationErrors.contains("workflowDef schemaVersion: 2 is only supported"));
     }
 
-    @Test
-    public void testWorkflowOwnerInvalidEmail() {
-        WorkflowDef workflowDef = new WorkflowDef();
-        workflowDef.setName("test_env");
-        workflowDef.setOwnerEmail("owner");
+    // @Test
+    // public void testWorkflowOwnerInvalidEmail() {
+    //     WorkflowDef workflowDef = new WorkflowDef();
+    //     workflowDef.setName("test_env");
+    //     workflowDef.setOwnerEmail("owner");
 
-        WorkflowTask workflowTask = new WorkflowTask();
+    //     WorkflowTask workflowTask = new WorkflowTask();
 
-        workflowTask.setName("t1");
-        workflowTask.setWorkflowTaskType(TaskType.SIMPLE);
-        workflowTask.setTaskReferenceName("t1");
+    //     workflowTask.setName("t1");
+    //     workflowTask.setWorkflowTaskType(TaskType.SIMPLE);
+    //     workflowTask.setTaskReferenceName("t1");
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("blabla", "");
-        workflowTask.setInputParameters(map);
+    //     Map<String, Object> map = new HashMap<>();
+    //     map.put("blabla", "");
+    //     workflowTask.setInputParameters(map);
 
-        workflowDef.getTasks().add(workflowTask);
+    //     workflowDef.getTasks().add(workflowTask);
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<Object>> result = validator.validate(workflowDef);
-        assertEquals(1, result.size());
+    //     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    //     Validator validator = factory.getValidator();
+    //     Set<ConstraintViolation<Object>> result = validator.validate(workflowDef);
+    //     assertEquals(1, result.size());
 
-        List<String> validationErrors = new ArrayList<>();
-        result.forEach(e -> validationErrors.add(e.getMessage()));
+    //     List<String> validationErrors = new ArrayList<>();
+    //     result.forEach(e -> validationErrors.add(e.getMessage()));
 
-        assertTrue(validationErrors.contains("ownerEmail should be valid email address"));
-    }
+    //     assertTrue(validationErrors.contains("ownerEmail should be valid email address"));
+    // }
 
     @Test
     public void testWorkflowOwnerValidEmail() {
