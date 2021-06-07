@@ -298,6 +298,7 @@ public class MetadataServiceTest {
         fail("metadataService.registerWorkflowDef did not throw ConstraintViolationException !");
     }
 
+    @Ignore
     @Test(expected = ConstraintViolationException.class)
     public void testValidateWorkflowDefNoName() {
         try {
