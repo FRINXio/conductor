@@ -25,6 +25,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -87,6 +88,10 @@ public class ElasticSearchV6Configuration {
     public RestClient restClient(ElasticSearchProperties properties) {
         RestClientBuilder restClientBuilder =
                 RestClient.builder(convertToHttpHosts(properties.toURLs()));
+        restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
+                .setDefaultIOReactorConfig(IOReactorConfig.custom()
+                        .setSoKeepAlive(true)
+                        .build()));
         if (properties.getRestClientConnectionRequestTimeout() > 0) {
             restClientBuilder.setRequestConfigCallback(
                     requestConfigBuilder ->
