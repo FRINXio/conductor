@@ -13,10 +13,19 @@
 package com.netflix.conductor.es6.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import com.netflix.conductor.dao.IndexDAO;
 import com.netflix.conductor.es6.dao.index.ElasticSearchDAOV6;
 import com.netflix.conductor.es6.dao.index.ElasticSearchRestDAOV6;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.http.HeaderElement;
+import org.apache.http.HeaderElementIterator;
 import org.apache.http.HttpHost;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.message.BasicHeaderElementIterator;
+import org.apache.http.protocol.HTTP;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -72,6 +81,11 @@ public class ElasticSearchV6Configuration {
     @Bean
     public RestClient restClient(ElasticSearchProperties properties) {
         RestClientBuilder restClientBuilder = RestClient.builder(convertToHttpHosts(properties.toURLs()));
+        log.warn("Constructing rest ES client");
+        restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
+                .setDefaultIOReactorConfig(IOReactorConfig.custom()
+                        .setSoKeepAlive(true)
+                        .build()));
         if (properties.getRestClientConnectionRequestTimeout() > 0) {
             restClientBuilder.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder
                     .setConnectionRequestTimeout(properties.getRestClientConnectionRequestTimeout()));
@@ -81,7 +95,12 @@ public class ElasticSearchV6Configuration {
 
     @Bean
     public RestClientBuilder restClientBuilder(ElasticSearchProperties properties) {
-        return RestClient.builder(convertToHttpHosts(properties.toURLs()));
+        final RestClientBuilder builder = RestClient.builder(convertToHttpHosts(properties.toURLs()));
+        builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
+                .setDefaultIOReactorConfig(IOReactorConfig.custom()
+                        .setSoKeepAlive(true)
+                        .build()));
+        return builder;
     }
 
     @Bean
