@@ -134,6 +134,21 @@
                 "org.springdoc:springdoc-openapi-common"
             ]
         },
+        "org.apache.logging.log4j:log4j-api": {
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-core": {
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-jul": {
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-slf4j-impl": {
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-web": {
+            "locked": "2.17.0"
+        },
         "org.apache.tomcat.embed:tomcat-embed-core": {
             "locked": "9.0.36",
             "transitive": [
@@ -581,6 +596,41 @@
                 "org.springdoc:springdoc-openapi-common"
             ]
         },
+        "org.apache.logging.log4j:log4j-api": {
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-core": {
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-jul": {
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-slf4j-impl": {
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-web": {
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
+        },
         "org.apache.tomcat.embed:tomcat-embed-core": {
             "locked": "9.0.36",
             "transitive": [
@@ -963,29 +1013,19 @@
             ]
         },
         "org.apache.logging.log4j:log4j-api": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.apache.logging.log4j:log4j-core",
-                "org.apache.logging.log4j:log4j-jul"
-            ]
+            "locked": "2.17.0"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.springframework.boot:spring-boot-starter-log4j2"
-            ]
+            "locked": "2.17.0"
         },
         "org.apache.logging.log4j:log4j-jul": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.springframework.boot:spring-boot-starter-log4j2"
-            ]
+            "locked": "2.17.0"
         },
         "org.apache.logging.log4j:log4j-slf4j-impl": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.springframework.boot:spring-boot-starter-log4j2"
-            ]
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-web": {
+            "locked": "2.17.0"
         },
         "org.apache.tomcat.embed:tomcat-embed-core": {
             "locked": "9.0.36",
@@ -1614,30 +1654,39 @@
             ]
         },
         "org.apache.logging.log4j:log4j-api": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.apache.logging.log4j:log4j-core",
-                "org.apache.logging.log4j:log4j-jul"
-            ]
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.apache.logging.log4j:log4j-slf4j-impl",
-                "org.springframework.boot:spring-boot-starter-log4j2"
-            ]
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
         },
         "org.apache.logging.log4j:log4j-jul": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.springframework.boot:spring-boot-starter-log4j2"
-            ]
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
         },
         "org.apache.logging.log4j:log4j-slf4j-impl": {
-            "locked": "2.13.3",
-            "transitive": [
-                "org.springframework.boot:spring-boot-starter-log4j2"
-            ]
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
+        },
+        "org.apache.logging.log4j:log4j-web": {
+            "firstLevelTransitive": [
+                "com.netflix.conductor:conductor-common",
+                "com.netflix.conductor:conductor-core"
+            ],
+            "locked": "2.17.0"
         },
         "org.apache.tomcat.embed:tomcat-embed-core": {
             "locked": "9.0.36",
