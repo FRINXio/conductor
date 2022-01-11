@@ -6,19 +6,19 @@
     },
     "compileClasspath": {
         "org.apache.logging.log4j:log4j-api": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-jul": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-slf4j-impl": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-web": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         }
     },
     "jacocoAgent": {
@@ -80,19 +80,19 @@
     },
     "runtimeClasspath": {
         "org.apache.logging.log4j:log4j-api": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-jul": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-slf4j-impl": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-web": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         }
     },
     "testCompileClasspath": {
@@ -157,19 +157,19 @@
             ]
         },
         "org.apache.logging.log4j:log4j-api": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-jul": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-slf4j-impl": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-web": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apiguardian:apiguardian-api": {
             "locked": "1.1.0",
@@ -479,19 +479,19 @@
             ]
         },
         "org.apache.logging.log4j:log4j-api": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-core": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-jul": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-slf4j-impl": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apache.logging.log4j:log4j-web": {
-            "locked": "2.17.0"
+            "locked": "2.17.1"
         },
         "org.apiguardian:apiguardian-api": {
             "locked": "1.1.0",
