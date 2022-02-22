@@ -12,6 +12,10 @@
  */
 package com.netflix.conductor.es6.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.conductor.dao.IndexDAO;
+import com.netflix.conductor.es6.dao.index.ElasticSearchDAOV6;
+import com.netflix.conductor.es6.dao.index.ElasticSearchRestDAOV6;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;

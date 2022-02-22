@@ -116,7 +116,7 @@ public class TaskDef extends BaseDef {
 
     @ProtoField(id = 18)
     @OwnerEmailMandatoryConstraint
-//    @Email(message = "ownerEmail should be valid email address")
+    //    @Email(message = "ownerEmail should be valid email address")
     private String ownerEmail;
 
     @ProtoField(id = 19)
@@ -294,16 +294,12 @@ public class TaskDef extends BaseDef {
         this.responseTimeoutSeconds = responseTimeoutSeconds;
     }
 
-    /**
-     * @param retryDelaySeconds the retryDelaySeconds to set
-     */
+    /** @param retryDelaySeconds the retryDelaySeconds to set */
     public void setRetryDelaySeconds(int retryDelaySeconds) {
         this.retryDelaySeconds = retryDelaySeconds;
     }
 
-    /**
-     * @return the inputTemplate
-     */
+    /** @return the inputTemplate */
     public Map<String, Object> getInputTemplate() {
         return inputTemplate;
     }
