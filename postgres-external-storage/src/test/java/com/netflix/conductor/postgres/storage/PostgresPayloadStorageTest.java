@@ -12,6 +12,8 @@
  */
 package com.netflix.conductor.postgres.storage;
 
+import com.netflix.conductor.common.run.ExternalStorageLocation;
+import com.netflix.conductor.common.utils.ExternalPayloadStorage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +34,7 @@ import org.testcontainers.utility.DockerImageName;
 import com.netflix.conductor.common.config.TestObjectMapperConfiguration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 @ContextConfiguration(classes = {TestObjectMapperConfiguration.class})
 @RunWith(SpringRunner.class)
@@ -128,15 +131,62 @@ public class PostgresPayloadStorageTest {
         executionPostgres.upload("dummyKey6.json", inputData, inputData.available());
         executionPostgres.upload("dummyKey7.json", inputData, inputData.available());
 
-        PreparedStatement stmt =
+        assertCount(5);
+    }
+
+    @Test
+    public void testHashEnsuringNoDuplicates() throws IOException, SQLException, InterruptedException {
+        final String location = getKey(inputString);
+
+        executionPostgres.upload(location, inputData, inputData.available());
+        final String createdOn = getCreatedOn(location);
+        Thread.sleep(500);
+        executionPostgres.upload(location, inputData, inputData.available());
+        final String createdOnAfterUpdate = getCreatedOn(location);
+
+        assertCount(1);
+        assertNotEquals(createdOnAfterUpdate, createdOn);
+    }
+
+    @Test
+    public void testDistinctHashedKey() {
+        final String location = getKey(inputString);
+        final String location2 = getKey(inputString);
+        final String location3 = getKey(inputString + "A");
+
+        assertNotEquals(location3, location);
+        assertEquals(location2, location);
+    }
+
+    private String getKey(String input) {
+        return executionPostgres.getLocation(ExternalPayloadStorage.Operation.READ,
+                ExternalPayloadStorage.PayloadType.TASK_INPUT,
+                "", input.getBytes(StandardCharsets.UTF_8)).getUri();
+    }
+
+    private void assertCount(int expected) throws SQLException {
+        try (PreparedStatement stmt =
                 testPostgres
                         .getDataSource()
                         .getConnection()
-                        .prepareStatement("SELECT count(id) FROM external.external_payload");
-        ResultSet rs = stmt.executeQuery();
-        rs.next();
-        assertEquals(5, rs.getInt(1));
-        stmt.close();
+                        .prepareStatement("SELECT count(id) FROM external.external_payload")) {
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            assertEquals(expected, rs.getInt(1));
+        }
+    }
+
+    private String getCreatedOn(String key) throws SQLException {
+        try (PreparedStatement stmt =
+                testPostgres
+                        .getDataSource()
+                        .getConnection()
+                        .prepareStatement("SELECT created_on FROM external.external_payload WHERE id = ?")) {
+            stmt.setString(1, key);
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            return rs.getString(1);
+        }
     }
 
     @After

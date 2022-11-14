@@ -19,6 +19,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.Arrays;
+import java.util.function.Supplier;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,9 @@ import com.netflix.conductor.postgres.config.PostgresPayloadProperties;
 public class PostgresPayloadStorage implements ExternalPayloadStorage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresPayloadStorage.class);
+    public static final String URI_SUFFIX_HASHED = ".hashed.json";
+    public static final String URI_SUFFIX = ".json";
+    public static final String URI_PREFIX_EXTERNAL = "/api/external/postgres/";
     private final String defaultMessageToUser;
 
     private final DataSource postgresDataSource;
@@ -65,14 +70,25 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
     public ExternalStorageLocation getLocation(
             Operation operation, PayloadType payloadType, String path) {
 
+        return getLocationInternal(path, () -> IDGenerator.generate() + URI_SUFFIX);
+    }
+
+    @Override
+    public ExternalStorageLocation getLocation(
+            Operation operation, PayloadType payloadType, String path, byte[] payloadBytes) {
+
+        return getLocationInternal(path, () -> Arrays.hashCode(payloadBytes) + URI_SUFFIX_HASHED);
+    }
+
+    private ExternalStorageLocation getLocationInternal(String path, Supplier<String> calculateKey) {
         ExternalStorageLocation externalStorageLocation = new ExternalStorageLocation();
         String objectKey;
         if (StringUtils.isNotBlank(path)) {
             objectKey = path;
         } else {
-            objectKey = IDGenerator.generate() + ".json";
+            objectKey = calculateKey.get();
         }
-        String uri = conductorUrl + "/api/external/postgres/" + objectKey;
+        String uri = conductorUrl + URI_PREFIX_EXTERNAL + objectKey;
         externalStorageLocation.setUri(uri);
         externalStorageLocation.setPath(objectKey);
         LOGGER.debug("External storage location URI: {}, location path: {}", uri, objectKey);
@@ -90,18 +106,48 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
      */
     @Override
     public void upload(String key, InputStream payload, long payloadSize) {
-        try (Connection conn = postgresDataSource.getConnection();
-                PreparedStatement stmt =
-                        conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?, ?)")) {
-            stmt.setString(1, key);
-            stmt.setBinaryStream(2, payload, payloadSize);
-            stmt.executeUpdate();
-            LOGGER.debug(
-                    "External PostgreSQL uploaded key: {}, payload size: {}", key, payloadSize);
+        try (Connection conn = postgresDataSource.getConnection()) {
+
+            // In case we are using hashed content as key, check if the content has not been stored yet
+            if (isHashed(key)) {
+                try (PreparedStatement stmt =
+                             conn.prepareStatement("SELECT id FROM " + tableName + " WHERE id = ?")) {
+                    stmt.setString(1, key);
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        // Content with same hash is already present in storage
+                        // updating created_on timestamp to refresh the content
+                        updateTimestamp(conn, key);
+                        return;
+                    }
+                }
+            }
+
+            try (PreparedStatement stmt =
+                         conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?, ?)")) {
+                stmt.setString(1, key);
+                stmt.setBinaryStream(2, payload, payloadSize);
+                stmt.executeUpdate();
+                LOGGER.debug(
+                        "External PostgreSQL uploaded key: {}, payload size: {}", key, payloadSize);
+            }
         } catch (SQLException e) {
             String msg = "Error uploading data into External PostgreSQL";
             LOGGER.error(msg, e);
             throw new ApplicationException(ApplicationException.Code.BACKEND_ERROR, msg, e);
+        }
+    }
+
+    private static boolean isHashed(String key) {
+        return key.endsWith(URI_SUFFIX_HASHED);
+    }
+
+    private void updateTimestamp(Connection conn, String key) throws SQLException {
+        try (PreparedStatement stmt =
+                     conn.prepareStatement("UPDATE " + tableName + " SET created_on = CURRENT_TIMESTAMP WHERE id = ?")) {
+            stmt.setString(1, key);
+            stmt.executeUpdate();
+            LOGGER.debug("External PostgreSQL refreshed key: {}", key);
         }
     }
 
