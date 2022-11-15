@@ -1,6 +1,6 @@
 ![Conductor](docs/docs/img/conductor-vector-x.png)
 
-## FRINX
+## FRINXX
 This fork is based on upstream version v2.28.3 + FRINX commits
 
 ## Conductor
