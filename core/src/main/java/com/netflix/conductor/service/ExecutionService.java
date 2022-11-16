@@ -622,6 +622,5 @@ public class ExecutionService {
             Operation operation, PayloadType payloadType, String path) {
         LOGGER.info(String.format("Simon getExternalStorageLocation: %s", path));
         return externalPayloadStorage.getLocation(operation, payloadType, path);
-        //        return externalPayloadStorage.getLocation(operation, payloadType, path);
     }
 }
