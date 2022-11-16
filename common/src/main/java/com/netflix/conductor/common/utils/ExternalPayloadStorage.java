@@ -49,7 +49,6 @@ public interface ExternalPayloadStorage {
     default ExternalStorageLocation getLocation(
             Operation operation, PayloadType payloadType, String path, byte[] payloadBytes) {
         return getLocation(operation, payloadType, path);
-        //        return getLocation(operation, payloadType, path, payloadBytes);
     }
 
     /**
