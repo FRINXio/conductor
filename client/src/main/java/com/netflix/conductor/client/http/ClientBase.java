@@ -275,6 +275,9 @@ public abstract class ClientBase {
                 "Payload type must be workflow input or task output");
         ExternalStorageLocation externalStorageLocation =
                 payloadStorage.getLocation(ExternalPayloadStorage.Operation.WRITE, payloadType, "");
+        //        ExternalStorageLocation externalStorageLocation =
+        //                payloadStorage.getLocation(ExternalPayloadStorage.Operation.WRITE,
+        // payloadType, "", payloadBytes);
         payloadStorage.upload(
                 externalStorageLocation.getUri(),
                 new ByteArrayInputStream(payloadBytes),
@@ -298,6 +301,9 @@ public abstract class ClientBase {
         ExternalStorageLocation externalStorageLocation =
                 payloadStorage.getLocation(
                         ExternalPayloadStorage.Operation.READ, payloadType, path);
+        //        ExternalStorageLocation externalStorageLocation =
+        //                payloadStorage.getLocation(
+        //                        ExternalPayloadStorage.Operation.READ, payloadType, path);
         try (InputStream inputStream = payloadStorage.download(externalStorageLocation.getUri())) {
             return objectMapper.readValue(inputStream, Map.class);
         } catch (IOException e) {

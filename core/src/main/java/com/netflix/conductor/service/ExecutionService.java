@@ -621,5 +621,6 @@ public class ExecutionService {
     public ExternalStorageLocation getExternalStorageLocation(
             Operation operation, PayloadType payloadType, String path) {
         return externalPayloadStorage.getLocation(operation, payloadType, path);
+        //        return externalPayloadStorage.getLocation(operation, payloadType, path);
     }
 }
