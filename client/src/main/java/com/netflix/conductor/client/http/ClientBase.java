@@ -296,7 +296,7 @@ public abstract class ClientBase {
     protected Map<String, Object> downloadFromExternalStorage(
             ExternalPayloadStorage.PayloadType payloadType, String path) {
         Preconditions.checkArgument(StringUtils.isNotBlank(path), "uri cannot be blank");
-        LOGGER.info(String.format("Simon downloadFromExternalStorage: %s", path));
+        LOGGER.info(String.format("EXTRA LOG: downloadFromExternalStorage: %s", path));
         ExternalStorageLocation externalStorageLocation =
                 payloadStorage.getLocation(
                         ExternalPayloadStorage.Operation.READ, payloadType, path);
