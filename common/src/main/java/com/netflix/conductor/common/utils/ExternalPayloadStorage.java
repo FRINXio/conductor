@@ -46,6 +46,12 @@ public interface ExternalPayloadStorage {
      */
     ExternalStorageLocation getLocation(Operation operation, PayloadType payloadType, String path);
 
+    default ExternalStorageLocation getLocation(
+            Operation operation, PayloadType payloadType, String path, byte[] payloadBytes) {
+        return getLocation(operation, payloadType, path);
+        //        return getLocation(operation, payloadType, path, payloadBytes);
+    }
+
     /**
      * Upload a json payload to the specified external storage location.
      *
