@@ -19,7 +19,6 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
