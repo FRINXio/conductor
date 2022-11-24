@@ -56,6 +56,7 @@ public class PostgresPayloadStorageTest {
     private final InputStream inputData;
     private final String key = "dummyKey.json";
     private static AtomicInteger threadCounter = new AtomicInteger(0);
+
     public PostgresPayloadStorageTest() {
         inputData = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
     }
@@ -119,29 +120,34 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
-    public void testMultithreadInsert() throws SQLException, ExecutionException, InterruptedException {
+    public void testMultithreadInsert()
+            throws SQLException, ExecutionException, InterruptedException {
         int numberOfThread = 12;
         int taskInThread = 100;
         ArrayList<CompletableFuture<?>> completableFutures = new ArrayList<>();
         Executor executor = Executors.newFixedThreadPool(numberOfThread);
-        IntStream.range(0, numberOfThread*taskInThread).forEach(i -> {
-
-            CompletableFuture<Void> objectCompletableFuture = CompletableFuture.supplyAsync(() -> {
-                try {
-                    uploadData();
-                    threadCounter.getAndIncrement();
-                    return null;
-                } catch (IOException | SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }, executor);
-            completableFutures.add(objectCompletableFuture);
-        });
+        IntStream.range(0, numberOfThread * taskInThread)
+                .forEach(
+                        i -> {
+                            CompletableFuture<Void> objectCompletableFuture =
+                                    CompletableFuture.supplyAsync(
+                                            () -> {
+                                                try {
+                                                    uploadData();
+                                                    threadCounter.getAndIncrement();
+                                                    return null;
+                                                } catch (IOException | SQLException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                            },
+                                            executor);
+                            completableFutures.add(objectCompletableFuture);
+                        });
         for (CompletableFuture<?> completableFuture : completableFutures) {
             completableFuture.get();
         }
         assertCount(1);
-        assertEquals(numberOfThread*taskInThread, threadCounter.get());
+        assertEquals(numberOfThread * taskInThread, threadCounter.get());
     }
 
     @Test
@@ -156,7 +162,8 @@ public class PostgresPayloadStorageTest {
 
     private String uploadData() throws SQLException, IOException {
         final String location = getKey(inputString);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
+        ByteArrayInputStream inputStream =
+                new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
         executionPostgres.upload(location, inputStream, inputStream.available());
         return getCreatedOn(location);
     }
@@ -195,10 +202,11 @@ public class PostgresPayloadStorageTest {
 
     private String getCreatedOn(String key) throws SQLException {
         try (Connection conn = testPostgres.getDataSource().getConnection()) {
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "SELECT created_on FROM external.external_payload WHERE id = ?")) {
+            try (PreparedStatement stmt =
+                    conn.prepareStatement(
+                            "SELECT created_on FROM external.external_payload WHERE id = ?")) {
                 stmt.setString(1, key);
-                try (ResultSet rs = stmt.executeQuery();) {
+                try (ResultSet rs = stmt.executeQuery(); ) {
                     rs.next();
                     return rs.getString(1);
                 }
