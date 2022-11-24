@@ -92,6 +92,13 @@ public class PostgresPayloadStorageTest {
 
     @Test
     public void testReadInputStreamFromDb() throws IOException, SQLException {
+        insertData();
+        assertEquals(
+                inputString,
+                new String(executionPostgres.download(key).readAllBytes(), StandardCharsets.UTF_8));
+    }
+
+    private void insertData() throws SQLException, IOException {
         PreparedStatement stmt =
                 testPostgres
                         .getDataSource()
@@ -100,10 +107,44 @@ public class PostgresPayloadStorageTest {
         stmt.setString(1, key);
         stmt.setBinaryStream(2, inputData, inputData.available());
         stmt.executeUpdate();
+    }
 
-        assertEquals(
-                inputString,
-                new String(executionPostgres.download(key).readAllBytes(), StandardCharsets.UTF_8));
+    @Test
+    public void testMultithreadDownload()
+            throws ExecutionException, InterruptedException, SQLException, IOException {
+        insertData();
+        int numberOfThread = 12;
+        int taskInThread = 100;
+        ArrayList<CompletableFuture<?>> completableFutures = new ArrayList<>();
+        Executor executor = Executors.newFixedThreadPool(numberOfThread);
+        IntStream.range(0, numberOfThread * taskInThread)
+                .forEach(
+                        i -> {
+                            CompletableFuture<Void> objectCompletableFuture =
+                                    CompletableFuture.supplyAsync(
+                                            () -> {
+                                                try {
+                                                    assertEquals(
+                                                            inputString,
+                                                            new String(
+                                                                    executionPostgres
+                                                                            .download(key)
+                                                                            .readAllBytes(),
+                                                                    StandardCharsets.UTF_8));
+                                                    threadCounter.getAndIncrement();
+                                                    return null;
+                                                } catch (IOException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                            },
+                                            executor);
+                            completableFutures.add(objectCompletableFuture);
+                        });
+        for (CompletableFuture<?> completableFuture : completableFutures) {
+            completableFuture.get();
+        }
+        assertCount(1);
+        assertEquals(numberOfThread * taskInThread, threadCounter.get());
     }
 
     @Test
