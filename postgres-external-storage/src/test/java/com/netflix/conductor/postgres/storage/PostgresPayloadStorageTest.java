@@ -21,6 +21,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 import org.junit.*;
@@ -113,11 +115,14 @@ public class PostgresPayloadStorageTest {
         assertCount(5);
     }
 
-    @Test
+    @Test(timeout = 60 * 1000)
     public void testMultithreadInsert() throws SQLException {
         int numberOfThread = 8;
+        int taskInThread = 10;
         ArrayList<CompletableFuture<?>> completableFutures = new ArrayList<>();
-        IntStream.range(0, numberOfThread).forEach(i -> {
+        Executor executor = Executors.newFixedThreadPool(numberOfThread);
+        IntStream.range(0, numberOfThread*taskInThread).forEach(i -> {
+
             CompletableFuture<Void> objectCompletableFuture = CompletableFuture.supplyAsync(() -> {
                 try {
                     uploadData();
@@ -126,13 +131,13 @@ public class PostgresPayloadStorageTest {
                 } catch (IOException | SQLException e) {
                     throw new RuntimeException(e);
                 }
-            });
+            }, executor);
             completableFutures.add(objectCompletableFuture);
         });
 
         completableFutures.forEach(CompletableFuture::join);
         assertCount(1);
-        assertEquals(numberOfThread, threadCounter);
+        assertEquals(numberOfThread*taskInThread, threadCounter);
     }
 
     @Test
