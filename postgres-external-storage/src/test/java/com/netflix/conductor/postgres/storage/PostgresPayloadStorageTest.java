@@ -59,7 +59,7 @@ public class PostgresPayloadStorageTest {
     public void setup() {
         postgreSQLContainer =
                 new PostgreSQLContainer<>(DockerImageName.parse("postgres"))
-                        .withDatabaseName("conductor").withReuse(true).withConnectTimeoutSeconds(60);
+                        .withDatabaseName("conductor");
         postgreSQLContainer.start();
         testPostgres = new PostgresPayloadTestUtil(postgreSQLContainer);
         executionPostgres =
