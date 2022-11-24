@@ -136,11 +136,11 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
                 PreparedStatement stmt =
                         conn.prepareStatement("SELECT data FROM " + tableName + " WHERE id = ?")) {
             stmt.setString(1, key);
-            ResultSet rs = stmt.executeQuery();
-            rs.next();
-            inputStream = rs.getBinaryStream(1);
-            rs.close();
-            LOGGER.debug("External PostgreSQL downloaded key: {}", key);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                inputStream = rs.getBinaryStream(1);
+                LOGGER.debug("External PostgreSQL downloaded key: {}", key);
+            }
         } catch (SQLException e) {
             String msg = "Error downloading data from external PostgreSQL";
             LOGGER.error(msg, e);
