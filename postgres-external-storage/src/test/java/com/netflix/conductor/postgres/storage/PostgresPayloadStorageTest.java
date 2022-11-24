@@ -19,10 +19,11 @@ import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -49,7 +50,7 @@ public class PostgresPayloadStorageTest {
                     + " Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.";
     private final InputStream inputData;
     private final String key = "dummyKey.json";
-
+    private static int threadCounter = 0;
     public PostgresPayloadStorageTest() {
         inputData = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
     }
@@ -58,7 +59,7 @@ public class PostgresPayloadStorageTest {
     public void setup() {
         postgreSQLContainer =
                 new PostgreSQLContainer<>(DockerImageName.parse("postgres"))
-                        .withDatabaseName("conductor");
+                        .withDatabaseName("conductor").withReuse(true).withConnectTimeoutSeconds(60);
         postgreSQLContainer.start();
         testPostgres = new PostgresPayloadTestUtil(postgreSQLContainer);
         executionPostgres =
@@ -113,18 +114,42 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
+    public void testMultithreadInsert() throws SQLException {
+        int numberOfThread = 8;
+        ArrayList<CompletableFuture<?>> completableFutures = new ArrayList<>();
+        IntStream.range(0, numberOfThread).forEach(i -> {
+            CompletableFuture<Void> objectCompletableFuture = CompletableFuture.supplyAsync(() -> {
+                try {
+                    uploadData();
+                    threadCounter++;
+                    return null;
+                } catch (IOException | SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            completableFutures.add(objectCompletableFuture);
+        });
+
+        completableFutures.forEach(CompletableFuture::join);
+        assertCount(1);
+        assertEquals(numberOfThread, threadCounter);
+    }
+
+    @Test
     public void testHashEnsuringNoDuplicates()
             throws IOException, SQLException, InterruptedException {
-        final String location = getKey(inputString);
-
-        executionPostgres.upload(location, inputData, inputData.available());
-        final String createdOn = getCreatedOn(location);
+        final String createdOn = uploadData();
         Thread.sleep(500);
-        executionPostgres.upload(location, inputData, inputData.available());
-        final String createdOnAfterUpdate = getCreatedOn(location);
-
+        final String createdOnAfterUpdate = uploadData();
         assertCount(1);
         assertNotEquals(createdOnAfterUpdate, createdOn);
+    }
+
+    private String uploadData() throws SQLException, IOException {
+        final String location = getKey(inputString);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
+        executionPostgres.upload(location, inputStream, inputStream.available());
+        return getCreatedOn(location);
     }
 
     @Test
