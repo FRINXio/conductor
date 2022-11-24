@@ -16,13 +16,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import org.junit.*;
@@ -52,7 +55,7 @@ public class PostgresPayloadStorageTest {
                     + " Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.";
     private final InputStream inputData;
     private final String key = "dummyKey.json";
-    private static int threadCounter = 0;
+    private static AtomicInteger threadCounter = new AtomicInteger(0);
     public PostgresPayloadStorageTest() {
         inputData = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
     }
@@ -115,10 +118,10 @@ public class PostgresPayloadStorageTest {
         assertCount(5);
     }
 
-    @Test(timeout = 60 * 1000)
-    public void testMultithreadInsert() throws SQLException {
-        int numberOfThread = 8;
-        int taskInThread = 10;
+    @Test
+    public void testMultithreadInsert() throws SQLException, ExecutionException, InterruptedException {
+        int numberOfThread = 12;
+        int taskInThread = 100;
         ArrayList<CompletableFuture<?>> completableFutures = new ArrayList<>();
         Executor executor = Executors.newFixedThreadPool(numberOfThread);
         IntStream.range(0, numberOfThread*taskInThread).forEach(i -> {
@@ -126,7 +129,7 @@ public class PostgresPayloadStorageTest {
             CompletableFuture<Void> objectCompletableFuture = CompletableFuture.supplyAsync(() -> {
                 try {
                     uploadData();
-                    threadCounter++;
+                    threadCounter.getAndIncrement();
                     return null;
                 } catch (IOException | SQLException e) {
                     throw new RuntimeException(e);
@@ -134,10 +137,11 @@ public class PostgresPayloadStorageTest {
             }, executor);
             completableFutures.add(objectCompletableFuture);
         });
-
-        completableFutures.forEach(CompletableFuture::join);
+        for (CompletableFuture<?> completableFuture : completableFutures) {
+            completableFuture.get();
+        }
         assertCount(1);
-        assertEquals(numberOfThread*taskInThread, threadCounter);
+        assertEquals(numberOfThread*taskInThread, threadCounter.get());
     }
 
     @Test
@@ -190,16 +194,15 @@ public class PostgresPayloadStorageTest {
     }
 
     private String getCreatedOn(String key) throws SQLException {
-        try (PreparedStatement stmt =
-                testPostgres
-                        .getDataSource()
-                        .getConnection()
-                        .prepareStatement(
-                                "SELECT created_on FROM external.external_payload WHERE id = ?")) {
-            stmt.setString(1, key);
-            ResultSet rs = stmt.executeQuery();
-            rs.next();
-            return rs.getString(1);
+        try (Connection conn = testPostgres.getDataSource().getConnection()) {
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT created_on FROM external.external_payload WHERE id = ?")) {
+                stmt.setString(1, key);
+                try (ResultSet rs = stmt.executeQuery();) {
+                    rs.next();
+                    return rs.getString(1);
+                }
+            }
         }
     }
 
