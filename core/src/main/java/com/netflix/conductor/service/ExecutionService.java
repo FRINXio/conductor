@@ -620,7 +620,6 @@ public class ExecutionService {
      */
     public ExternalStorageLocation getExternalStorageLocation(
             Operation operation, PayloadType payloadType, String path) {
-        LOGGER.info(String.format("EXTRA LOG: getExternalStorageLocation: %s", path));
         return externalPayloadStorage.getLocation(operation, payloadType, path);
     }
 }

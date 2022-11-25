@@ -55,7 +55,6 @@ public class PostgresPayloadStorageTest {
                     + " Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.";
     private final InputStream inputData;
     private final String key = "dummyKey.json";
-    private static AtomicInteger threadCounter = new AtomicInteger(0);
 
     public PostgresPayloadStorageTest() {
         inputData = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
@@ -112,6 +111,7 @@ public class PostgresPayloadStorageTest {
     @Test
     public void testMultithreadDownload()
             throws ExecutionException, InterruptedException, SQLException, IOException {
+        AtomicInteger threadCounter = new AtomicInteger(0);
         insertData();
         int numberOfThread = 12;
         int taskInThread = 100;
@@ -119,32 +119,37 @@ public class PostgresPayloadStorageTest {
         Executor executor = Executors.newFixedThreadPool(numberOfThread);
         IntStream.range(0, numberOfThread * taskInThread)
                 .forEach(
-                        i -> {
-                            CompletableFuture<Void> objectCompletableFuture =
-                                    CompletableFuture.supplyAsync(
-                                            () -> {
-                                                try {
-                                                    assertEquals(
-                                                            inputString,
-                                                            new String(
-                                                                    executionPostgres
-                                                                            .download(key)
-                                                                            .readAllBytes(),
-                                                                    StandardCharsets.UTF_8));
-                                                    threadCounter.getAndIncrement();
-                                                    return null;
-                                                } catch (IOException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                            },
-                                            executor);
-                            completableFutures.add(objectCompletableFuture);
-                        });
+                        i ->
+                                createFutureForDownloadOperation(
+                                        threadCounter, completableFutures, executor));
         for (CompletableFuture<?> completableFuture : completableFutures) {
             completableFuture.get();
         }
         assertCount(1);
         assertEquals(numberOfThread * taskInThread, threadCounter.get());
+    }
+
+    private void createFutureForDownloadOperation(
+            AtomicInteger threadCounter,
+            ArrayList<CompletableFuture<?>> completableFutures,
+            Executor executor) {
+        CompletableFuture<Void> objectCompletableFuture =
+                CompletableFuture.supplyAsync(() -> downloadData(threadCounter), executor);
+        completableFutures.add(objectCompletableFuture);
+    }
+
+    private Void downloadData(AtomicInteger threadCounter) {
+        try {
+            assertEquals(
+                    inputString,
+                    new String(
+                            executionPostgres.download(key).readAllBytes(),
+                            StandardCharsets.UTF_8));
+            threadCounter.getAndIncrement();
+            return null;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -163,32 +168,40 @@ public class PostgresPayloadStorageTest {
     @Test
     public void testMultithreadInsert()
             throws SQLException, ExecutionException, InterruptedException {
+        AtomicInteger threadCounter = new AtomicInteger(0);
         int numberOfThread = 12;
         int taskInThread = 100;
         ArrayList<CompletableFuture<?>> completableFutures = new ArrayList<>();
         Executor executor = Executors.newFixedThreadPool(numberOfThread);
         IntStream.range(0, numberOfThread * taskInThread)
                 .forEach(
-                        i -> {
-                            CompletableFuture<Void> objectCompletableFuture =
-                                    CompletableFuture.supplyAsync(
-                                            () -> {
-                                                try {
-                                                    uploadData();
-                                                    threadCounter.getAndIncrement();
-                                                    return null;
-                                                } catch (IOException | SQLException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                            },
-                                            executor);
-                            completableFutures.add(objectCompletableFuture);
-                        });
+                        i ->
+                                createFutureForUploadOperation(
+                                        threadCounter, completableFutures, executor));
         for (CompletableFuture<?> completableFuture : completableFutures) {
             completableFuture.get();
         }
         assertCount(1);
         assertEquals(numberOfThread * taskInThread, threadCounter.get());
+    }
+
+    private void createFutureForUploadOperation(
+            AtomicInteger threadCounter,
+            ArrayList<CompletableFuture<?>> completableFutures,
+            Executor executor) {
+        CompletableFuture<Void> objectCompletableFuture =
+                CompletableFuture.supplyAsync(() -> uploadData(threadCounter), executor);
+        completableFutures.add(objectCompletableFuture);
+    }
+
+    private Void uploadData(AtomicInteger threadCounter) {
+        try {
+            uploadData();
+            threadCounter.getAndIncrement();
+            return null;
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
