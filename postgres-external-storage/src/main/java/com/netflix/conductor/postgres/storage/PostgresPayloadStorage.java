@@ -21,10 +21,10 @@ import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.DigestUtils;
 
 import com.netflix.conductor.common.run.ExternalStorageLocation;
 import com.netflix.conductor.common.utils.ExternalPayloadStorage;
@@ -71,7 +71,7 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
             Operation operation, PayloadType payloadType, String path, byte[] payloadBytes) {
 
         return getLocationInternal(
-                path, () -> DigestUtils.md5DigestAsHex(payloadBytes) + URI_SUFFIX_HASHED);
+                path, () -> DigestUtils.sha256Hex(payloadBytes) + URI_SUFFIX_HASHED);
     }
 
     private ExternalStorageLocation getLocationInternal(
