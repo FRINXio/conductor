@@ -18,11 +18,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import java.util.Arrays;
 import java.util.function.Supplier;
+
 import javax.sql.DataSource;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,10 +77,12 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
     public ExternalStorageLocation getLocation(
             Operation operation, PayloadType payloadType, String path, byte[] payloadBytes) {
 
-        return getLocationInternal(path, () -> Arrays.hashCode(payloadBytes) + URI_SUFFIX_HASHED);
+        return getLocationInternal(
+                path, () -> DigestUtils.sha256Hex(payloadBytes) + URI_SUFFIX_HASHED);
     }
 
-    private ExternalStorageLocation getLocationInternal(String path, Supplier<String> calculateKey) {
+    private ExternalStorageLocation getLocationInternal(
+            String path, Supplier<String> calculateKey) {
         ExternalStorageLocation externalStorageLocation = new ExternalStorageLocation();
         String objectKey;
         if (StringUtils.isNotBlank(path)) {
@@ -106,28 +108,21 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
      */
     @Override
     public void upload(String key, InputStream payload, long payloadSize) {
-        try (Connection conn = postgresDataSource.getConnection()) {
-
-            // In case we are using hashed content as key, check if the content has not been stored yet
-            if (isHashed(key)) {
-                try (PreparedStatement stmt =
-                             conn.prepareStatement("SELECT id FROM " + tableName + " WHERE id = ?")) {
-                    stmt.setString(1, key);
-                    ResultSet rs = stmt.executeQuery();
-                    if (rs.next()) {
-                        // Content with same hash is already present in storage
-                        // updating created_on timestamp to refresh the content
-                        updateTimestamp(conn, key);
-                        return;
-                    }
-                }
-            }
-
-            try (PreparedStatement stmt =
-                         conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?, ?)")) {
-                stmt.setString(1, key);
-                stmt.setBinaryStream(2, payload, payloadSize);
-                stmt.executeUpdate();
+        try (Connection conn = postgresDataSource.getConnection();
+                PreparedStatement stmt =
+                        conn.prepareStatement(
+                                "INSERT INTO "
+                                        + tableName
+                                        + " (id, data) VALUES (?, ?) ON CONFLICT(id) "
+                                        + "DO UPDATE SET created_on=CURRENT_TIMESTAMP")) {
+            stmt.setString(1, key);
+            stmt.setBinaryStream(2, payload, payloadSize);
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.warn(
+                        "Data wasn't uploaded into External PostgreSQL database key: {}, payload size: {}",
+                        key,
+                        payloadSize);
+            } else {
                 LOGGER.debug(
                         "External PostgreSQL uploaded key: {}, payload size: {}", key, payloadSize);
             }
@@ -135,19 +130,6 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
             String msg = "Error uploading data into External PostgreSQL";
             LOGGER.error(msg, e);
             throw new ApplicationException(ApplicationException.Code.BACKEND_ERROR, msg, e);
-        }
-    }
-
-    private static boolean isHashed(String key) {
-        return key.endsWith(URI_SUFFIX_HASHED);
-    }
-
-    private void updateTimestamp(Connection conn, String key) throws SQLException {
-        try (PreparedStatement stmt =
-                     conn.prepareStatement("UPDATE " + tableName + " SET created_on = CURRENT_TIMESTAMP WHERE id = ?")) {
-            stmt.setString(1, key);
-            stmt.executeUpdate();
-            LOGGER.debug("External PostgreSQL refreshed key: {}", key);
         }
     }
 
@@ -165,14 +147,14 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
                 PreparedStatement stmt =
                         conn.prepareStatement("SELECT data FROM " + tableName + " WHERE id = ?")) {
             stmt.setString(1, key);
-            ResultSet rs = stmt.executeQuery();
-            if (!rs.next()) {
-                LOGGER.debug("External PostgreSQL data with this ID: {} does not exist", key);
-                return new ByteArrayInputStream(defaultMessageToUser.getBytes());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    LOGGER.debug("External PostgreSQL data with this ID: {} does not exist", key);
+                    return new ByteArrayInputStream(defaultMessageToUser.getBytes());
+                }
+                inputStream = rs.getBinaryStream(1);
+                LOGGER.debug("External PostgreSQL downloaded key: {}", key);
             }
-            inputStream = rs.getBinaryStream(1);
-            rs.close();
-            LOGGER.debug("External PostgreSQL downloaded key: {}", key);
         } catch (SQLException e) {
             String msg = "Error downloading data from external PostgreSQL";
             LOGGER.error(msg, e);
