@@ -47,13 +47,14 @@ public interface ExternalPayloadStorage {
     ExternalStorageLocation getLocation(Operation operation, PayloadType payloadType, String path);
 
     /**
-     * Obtain an uri used to store/access a json payload in external storage.
+     * Obtain an uri used to store/access a json payload in external storage with deduplication of data
+     *      based on payloadBytes digest.
      *
      * @param operation the type of {@link Operation} to be performed with the uri
      * @param payloadType the {@link PayloadType} that is being accessed at the uri
      * @param path (optional) the relative path for which the external storage location object is to
      *     be populated. If path is not specified, it will be computed and populated.
-     * @param payloadBytes for calculating md5 digest which is used for objectKey
+     * @param payloadBytes for calculating digest which is used for objectKey
      * @return a {@link ExternalStorageLocation} object which contains the uri and the path for the
      *     json payload
      */

@@ -118,7 +118,7 @@ public class PostgresPayloadStorage implements ExternalPayloadStorage {
             stmt.setString(1, key);
             stmt.setBinaryStream(2, payload, payloadSize);
             if (stmt.executeUpdate() == 0) {
-                LOGGER.warn(
+                LOGGER.debug(
                         "Data wasn't uploaded into External PostgreSQL database key: {}, payload size: {}",
                         key,
                         payloadSize);
