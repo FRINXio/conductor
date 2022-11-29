@@ -47,8 +47,8 @@ public interface ExternalPayloadStorage {
     ExternalStorageLocation getLocation(Operation operation, PayloadType payloadType, String path);
 
     /**
-     * Obtain an uri used to store/access a json payload in external storage with deduplication of data
-     *      based on payloadBytes digest.
+     * Obtain an uri used to store/access a json payload in external storage with deduplication of
+     * data based on payloadBytes digest.
      *
      * @param operation the type of {@link Operation} to be performed with the uri
      * @param payloadType the {@link PayloadType} that is being accessed at the uri

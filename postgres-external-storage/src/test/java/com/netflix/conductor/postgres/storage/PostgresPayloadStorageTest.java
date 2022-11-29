@@ -113,7 +113,7 @@ public class PostgresPayloadStorageTest {
         stmt.executeUpdate();
     }
 
-    @Test(timeout = 60*1000)
+    @Test(timeout = 60 * 1000)
     public void testMultithreadDownload()
             throws ExecutionException, InterruptedException, SQLException, IOException {
         AtomicInteger threadCounter = new AtomicInteger(0);
@@ -188,7 +188,7 @@ public class PostgresPayloadStorageTest {
         assertCount(5);
     }
 
-    @Test(timeout = 60*1000)
+    @Test(timeout = 60 * 1000)
     public void testMultithreadInsert()
             throws SQLException, ExecutionException, InterruptedException {
         AtomicInteger threadCounter = new AtomicInteger(0);
