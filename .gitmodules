@@ -1,0 +1,4 @@
+[submodule "conductor-community"]
+	path = conductor-community
+	url = git@github.com:FRINXio/conductor-community.git
+	branch = main
