@@ -1,0 +1,22 @@
+name: Verify
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+
+  # Run tests for any PRs.
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build image
+        run: ./gradlew build -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000
