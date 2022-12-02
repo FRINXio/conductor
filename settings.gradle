@@ -36,19 +36,19 @@ include 'server'
 include 'common'
 include 'core'
 include 'client'
-include 'client-spring'
+//include 'client-spring'
 
 include 'cassandra-persistence'
 include 'redis-persistence'
 
 include 'es6-persistence'
 
-include 'redis-lock'
+//include 'redis-lock'
 
-include 'awss3-storage'
-include 'awssqs-event-queue'
+//include 'awss3-storage'
+//include 'awssqs-event-queue'
 
-include 'redis-concurrency-limit'
+//include 'redis-concurrency-limit'
 
 include 'json-jq-task'
 include 'http-task'
@@ -58,8 +58,16 @@ include 'grpc'
 include 'grpc-server'
 include 'grpc-client'
 
-include 'java-sdk'
+//include 'java-sdk'
 
 include 'test-harness'
+
+// Below are dependencies from conductor-community which needs to be initialized as a submodule
+include ':conductor-community:external-payload-storage:postgres-external-storage'
+include ':conductor-community:metrics'
+include ':conductor-community:test-util'
+include ':conductor-community:persistence:common-persistence'
+include ':conductor-community:persistence:postgres-persistence'
+include ':conductor-community:archive'
 
 rootProject.children.each {it.name="conductor-${it.name}"}

@@ -187,7 +187,8 @@ sonarqube {
     }
 }
 
-configure(allprojects - project(':conductor-grpc')) {
+// Exclude conductor-community subprojects from spotless
+configure(allprojects - project(':conductor-grpc') - allprojects.findAll {it.displayName.contains("conductor-community")}) {
     apply plugin: 'com.diffplug.spotless'
 
     spotless {
@@ -200,7 +201,7 @@ configure(allprojects - project(':conductor-grpc')) {
     }
 }
 
-['cassandra-persistence', 'core', 'redis-concurrency-limit', 'test-harness', 'client'].each {
+['cassandra-persistence', 'core', 'test-harness', 'client'].each {
     configure(project(":conductor-$it")) {
         spotless {
             groovy {
