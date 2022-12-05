@@ -1247,6 +1247,9 @@ public abstract class AbstractProtoMapper {
         }
         to.setPriority( from.getPriority() );
         to.addAllFailedTaskNames( from.getFailedTaskNames() );
+        if (from.getParentWorkflowId() != null) {
+            to.setParentWorkflowId( from.getParentWorkflowId() );
+        }
         return to.build();
     }
 
@@ -1270,6 +1273,7 @@ public abstract class AbstractProtoMapper {
         to.setExternalOutputPayloadStoragePath( from.getExternalOutputPayloadStoragePath() );
         to.setPriority( from.getPriority() );
         to.setFailedTaskNames( from.getFailedTaskNamesList().stream().collect(Collectors.toCollection(HashSet::new)) );
+        to.setParentWorkflowId( from.getParentWorkflowId() );
         return to;
     }
 
