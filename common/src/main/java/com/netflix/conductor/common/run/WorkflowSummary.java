@@ -88,6 +88,9 @@ public class WorkflowSummary {
     @ProtoField(id = 18)
     private Set<String> failedTaskNames = new HashSet<>();
 
+    @ProtoField(id = 19)
+    private String parentWorkflowId;
+
     public WorkflowSummary() {}
 
     public WorkflowSummary(Workflow workflow) {
@@ -100,6 +103,7 @@ public class WorkflowSummary {
         this.workflowId = workflow.getWorkflowId();
         this.priority = workflow.getPriority();
         this.correlationId = workflow.getCorrelationId();
+        this.parentWorkflowId = workflow.getParentWorkflowId();
         if (workflow.getCreateTime() != null) {
             this.startTime = sdf.format(new Date(workflow.getCreateTime()));
         }
@@ -367,6 +371,14 @@ public class WorkflowSummary {
                 && getStatus() == that.getStatus()
                 && Objects.equals(getReasonForIncompletion(), that.getReasonForIncompletion())
                 && Objects.equals(getEvent(), that.getEvent());
+    }
+
+    public String getParentWorkflowId() {
+        return parentWorkflowId;
+    }
+
+    public void setParentWorkflowId(String parentWorkflowId) {
+        this.parentWorkflowId = parentWorkflowId;
     }
 
     @Override
