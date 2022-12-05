@@ -12,6 +12,7 @@
  */
 package com.netflix.conductor;
 
+import com.netflix.conductor.contribs.metrics.DatadogMetricsConfiguration;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.metrics.export.datadog.DatadogMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.core.io.FileSystemResource;
@@ -29,7 +31,7 @@ import org.springframework.core.io.FileSystemResource;
 // FRINX: add orkes package to include the archive module (since it is in orkes package)
 @SpringBootApplication(
         scanBasePackages = {"io.orkes.conductor", "com.netflix.conductor"},
-        exclude = DataSourceAutoConfiguration.class)
+        exclude = { DataSourceAutoConfiguration.class, DatadogMetricsExportAutoConfiguration.class})
 public class Conductor {
 
     private static final Logger log = LoggerFactory.getLogger(Conductor.class);
