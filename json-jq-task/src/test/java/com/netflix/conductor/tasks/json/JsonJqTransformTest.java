@@ -47,6 +47,7 @@ public class JsonJqTransformTest {
         task.setOutputData(new HashMap<>());
 
         jsonJqTransform.start(workflow, task, null);
+        jsonJqTransform.execute(workflow, task, null);
 
         assertNull(task.getOutputData().get("error"));
         assertEquals("VALUE", task.getOutputData().get("result").toString());
@@ -64,6 +65,7 @@ public class JsonJqTransformTest {
         task.setOutputData(new HashMap<>());
 
         jsonJqTransform.start(workflow, task, null);
+        jsonJqTransform.execute(workflow, task, null);
 
         assertTrue(
                 ((String) task.getOutputData().get("error"))
@@ -90,6 +92,7 @@ public class JsonJqTransformTest {
         task.setOutputData(new HashMap<>());
 
         jsonJqTransform.start(workflow, task, null);
+        jsonJqTransform.execute(workflow, task, null);
 
         assertTrue(
                 ((String) task.getOutputData().get("error"))
@@ -115,6 +118,7 @@ public class JsonJqTransformTest {
         task.setOutputData(new HashMap<>());
 
         jsonJqTransform.start(workflow, task, null);
+        jsonJqTransform.execute(workflow, task, null);
 
         assertNull(task.getOutputData().get("error"));
         assertTrue(task.getOutputData().get("result") instanceof Map);
@@ -141,6 +145,7 @@ public class JsonJqTransformTest {
         task.setInputData(taskInput);
 
         jsonJqTransform.start(workflow, task, null);
+        jsonJqTransform.execute(workflow, task, null);
 
         assertNull(task.getOutputData().get("error"));
         assertTrue(task.getOutputData().get("result") instanceof String);
@@ -165,6 +170,7 @@ public class JsonJqTransformTest {
         task.setInputData(taskInput);
 
         jsonJqTransform.start(workflow, task, null);
+        jsonJqTransform.execute(workflow, task, null);
 
         assertNull(task.getOutputData().get("error"));
         assertTrue(task.getOutputData().get("result") instanceof List);
@@ -182,6 +188,7 @@ public class JsonJqTransformTest {
         task.setInputData(taskInput);
 
         jsonJqTransform.start(workflow, task, null);
+        jsonJqTransform.execute(workflow, task, null);
 
         assertNull(task.getOutputData().get("error"));
         assertNull(task.getOutputData().get("result"));
