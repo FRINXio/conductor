@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -116,7 +115,7 @@ public class TaskDef extends BaseDef {
 
     @ProtoField(id = 18)
     @OwnerEmailMandatoryConstraint
-    @Email(message = "ownerEmail should be valid email address")
+    //    @Email(message = "ownerEmail should be valid email address")
     private String ownerEmail;
 
     @ProtoField(id = 19)
