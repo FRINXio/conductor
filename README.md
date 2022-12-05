@@ -1,5 +1,19 @@
 ![Conductor](docs/docs/img/logo.png)
 
+# FRINX considerations
+
+> :warning: **Only applies to this fork**
+
+We are using a subset (specialized build) of conductor including some compontents from conductor-community and orkes-conductor-community.
+
+FRINX fork of conductor: this
+FRINX fork of conductor community: https://github.com/FRINXio/conductor-community 
+
+* FRINX fork of conductor also includes python client which in upstream is now located at: https://github.com/conductor-sdk/conductor-python
+* FRINX fork of conductor community also incldues packages from orkes-conductor-community, namely the archive package
+
+Conductor/server produces a build specific to us. We do not build / test all the components.
+
 # Conductor
 [![Github release](https://img.shields.io/github/v/release/Netflix/conductor.svg)](https://GitHub.com/Netflix/conductor/releases)
 [![CI](https://github.com/Netflix/conductor/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Netflix/conductor/actions/workflows/ci.yml)
