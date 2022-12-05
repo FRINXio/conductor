@@ -22,6 +22,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
@@ -92,6 +93,7 @@ public class TaskDefTest {
         assertTrue(validationErrors.contains("ownerEmail cannot be empty"));
     }
 
+    @Ignore
     @Test
     public void testTaskDefInvalidEmail() {
         TaskDef taskDef = new TaskDef();
