@@ -62,4 +62,8 @@ ext {
     revMicrometer = '1.6.2'
     revAmqpClient = '5.13.0'
     revLombok = '1.18.24'
+
+    // Http client which is needed by the Http built in task
+    // but is not explicitly stated by conductor
+    revHttpCLient = '4.5.13'
 }
