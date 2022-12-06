@@ -30,7 +30,7 @@ import org.springframework.core.io.FileSystemResource;
 // FRINX: add orkes package to include the archive module (since it is in orkes package)
 @SpringBootApplication(
         scanBasePackages = {"io.orkes.conductor", "com.netflix.conductor"},
-        exclude = { DataSourceAutoConfiguration.class, DatadogMetricsExportAutoConfiguration.class})
+        exclude = {DataSourceAutoConfiguration.class, DatadogMetricsExportAutoConfiguration.class})
 public class Conductor {
 
     private static final Logger log = LoggerFactory.getLogger(Conductor.class);

@@ -32,3 +32,6 @@ dependencies {
     testImplementation "org.testcontainers:elasticsearch:${revTestContainer}"
     testImplementation project(':conductor-common').sourceSets.test.output
 }
+
+// Disable tests, we are not using es
+test.onlyIf { false }
