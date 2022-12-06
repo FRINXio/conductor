@@ -1,5 +1,11 @@
 apply plugin: 'groovy'
 
+// Exclude archive package since it does not work with ES6 on classpath
+// it is not used here directly, but is brought by the server dependency transitively
+configurations.implementation {
+    exclude group: 'com.netflix.conductor', module: 'archive'
+}
+
 dependencies {
     testImplementation project(':conductor-server')
     testImplementation project(':conductor-common')
@@ -35,9 +41,19 @@ dependencies {
     testImplementation "org.elasticsearch.client:elasticsearch-rest-client"
     testImplementation "org.elasticsearch.client:elasticsearch-rest-high-level-client"
 
+//    testImplementation "org.elasticsearch:elasticsearch:6.8.23"
+//    testImplementation "org.elasticsearch.client:transport:6.8.23"
+//    testImplementation "org.elasticsearch.client:elasticsearch-rest-client:6.8.23"
+//    testImplementation "org.elasticsearch.client:elasticsearch-rest-high-level-client:6.8.23"
+
     testImplementation "org.testcontainers:elasticsearch:${revTestContainer}"
     testImplementation('junit:junit:4.13.2')
     testImplementation "org.junit.vintage:junit-vintage-engine"
     testImplementation "javax.ws.rs:javax.ws.rs-api:${revJAXRS}"
     testImplementation "org.glassfish.jersey.core:jersey-common:${revJerseyCommon}"
+}
+
+test {
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = 'full'
 }

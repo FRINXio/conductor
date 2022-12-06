@@ -19,16 +19,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.metrics.export.datadog.DatadogMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.FileSystemResource;
 
 // Prevents from the datasource beans to be loaded, AS they are needed only for specific databases.
 // In case that SQL database is selected this class will be imported back in the appropriate
 // database persistence module.
-@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
-@ComponentScan(basePackages = {"com.netflix.conductor", "io.orkes.conductor"})
+// FRINX: add orkes package to include the archive module (since it is in orkes package)
+@SpringBootApplication(
+        scanBasePackages = {"io.orkes.conductor", "com.netflix.conductor"},
+        exclude = {DataSourceAutoConfiguration.class, DatadogMetricsExportAutoConfiguration.class})
 public class Conductor {
 
     private static final Logger log = LoggerFactory.getLogger(Conductor.class);
