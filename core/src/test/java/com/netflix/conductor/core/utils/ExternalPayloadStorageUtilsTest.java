@@ -108,8 +108,9 @@ public class ExternalPayloadStorageUtilsTest {
             .getResourceAsStream("/payload.json");
         Map<String, Object> payload = objectMapper.readValue(stream, Map.class);
 
+        byte[] payloadBytes = objectMapper.writeValueAsString(payload).getBytes();
         when(externalPayloadStorage
-            .getLocation(ExternalPayloadStorage.Operation.WRITE, ExternalPayloadStorage.PayloadType.TASK_INPUT, ""))
+            .getLocation(ExternalPayloadStorage.Operation.WRITE, ExternalPayloadStorage.PayloadType.TASK_INPUT, "", payloadBytes))
             .thenReturn(location);
         doAnswer(invocation -> {
             uploadCount.incrementAndGet();
