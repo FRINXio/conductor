@@ -14,7 +14,7 @@ COPY . /conductor
 WORKDIR /conductor
 
 # Build the server on run
-RUN ./gradlew build -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000 -x test
+RUN ./gradlew -Prelease.version=2.0.0-SNAPSHOT build -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000 -x test
 
 # ===========================================================================================================
 # 1. Bin stage
