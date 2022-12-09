@@ -20,7 +20,7 @@ jobs:
       run:
         working-directory: ./polyglot-clients/python
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Check package version
       run: |
         grep -q "version = '1." setup.py
