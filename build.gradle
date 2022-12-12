@@ -211,3 +211,10 @@ configure(allprojects - project(':conductor-grpc') - allprojects.findAll {it.dis
         }
     }
 }
+
+/* Make sure conductor-community is present as a submodule */
+build.doFirst {
+    assert file("./conductor-community/build.gradle").exists(): "Conductor community submodule not initialized !" +
+            " Perform 'git submodule init' + 'git submodule update' or in case of github action" +
+            " add 'submodules: recursive' under checkout action"
+}
