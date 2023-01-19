@@ -202,6 +202,7 @@ public class AsyncSystemTaskExecutor {
             return null;
         }
     }
+
     private TaskModel populateLeanTaskQuietly(TaskModel task) {
         try {
             executionDAOFacade.populateTaskData(task);
