@@ -428,6 +428,10 @@ public class ExecutionDAOFacade {
         return taskModel;
     }
 
+    public TaskModel getTaskModelLean(String taskId) {
+        return getTaskFromDatastore(taskId);
+    }
+
     public Task getTask(String taskId) {
         TaskModel taskModel = getTaskFromDatastore(taskId);
         if (taskModel != null) {
