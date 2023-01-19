@@ -105,8 +105,6 @@ public class AsyncSystemTaskExecutor {
         // if we are here the Task object is updated and needs to be persisted regardless of an
         // exception
         try {
-            // tu nam teoreticky netreba nacitavat cely workflow a az v konkretnom ife nacitavat
-            // vsetko
             WorkflowModel workflow =
                     executionDAOFacade.getWorkflowModel(
                             workflowId, systemTask.isTaskRetrievalRequired());
