@@ -137,13 +137,13 @@ public class AsyncSystemTaskExecutor {
 
             // Load the full task including externalized payloads for execution
             if (task.getStatus() == TaskModel.Status.SCHEDULED) {
-                populateLeanTaskQuietly(task);
+                task = loadTaskQuietly(taskId);
                 task.setStartTime(System.currentTimeMillis());
                 Monitors.recordQueueWaitTime(task.getTaskDefName(), task.getQueueWaitTime());
                 systemTask.start(workflow, task, workflowExecutor);
             } else if (task.getStatus() == TaskModel.Status.IN_PROGRESS) {
                 if (systemTask.isTaskRetrievalRequired()) {
-                    populateLeanTaskQuietly(task);
+                    task = loadTaskQuietly(taskId);
                 }
                 systemTask.execute(workflow, task, workflowExecutor);
             }
@@ -205,10 +205,9 @@ public class AsyncSystemTaskExecutor {
         }
     }
 
-    private TaskModel populateLeanTaskQuietly(TaskModel task) {
+    private TaskModel loadTaskQuietly(String taskId) {
         try {
-            executionDAOFacade.populateTaskData(task);
-            return task;
+            return executionDAOFacade.getTaskModel(taskId);
         } catch (Exception e) {
             return null;
         }
