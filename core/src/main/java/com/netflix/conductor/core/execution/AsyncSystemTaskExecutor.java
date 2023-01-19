@@ -80,7 +80,6 @@ public class AsyncSystemTaskExecutor {
         }
 
         if (task.getStatus().equals(TaskModel.Status.SCHEDULED)) {
-            // tu treba cele data
             if (executionDAOFacade.exceedsInProgressLimit(task)) {
                 LOGGER.warn(
                         "Concurrent Execution limited for {}:{}", taskId, task.getTaskDefName());
@@ -133,7 +132,6 @@ public class AsyncSystemTaskExecutor {
 
             boolean isTaskAsyncComplete = systemTask.isAsyncComplete(task);
             if (task.getStatus() == TaskModel.Status.SCHEDULED || !isTaskAsyncComplete) {
-                // tu treba full copy
                 task.incrementPollCount();
             }
 
@@ -142,7 +140,6 @@ public class AsyncSystemTaskExecutor {
                 populateLeanTaskQuietly(task);
                 task.setStartTime(System.currentTimeMillis());
                 Monitors.recordQueueWaitTime(task.getTaskDefName(), task.getQueueWaitTime());
-                // az tu asi treba cely workflow
                 systemTask.start(workflow, task, workflowExecutor);
             } else if (task.getStatus() == TaskModel.Status.IN_PROGRESS) {
                 if (systemTask.isTaskRetrievalRequired()) {
