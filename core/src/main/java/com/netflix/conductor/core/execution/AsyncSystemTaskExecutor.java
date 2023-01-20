@@ -61,7 +61,6 @@ public class AsyncSystemTaskExecutor {
      * @param taskId The id of the {@link TaskModel} object.
      */
     public void execute(WorkflowSystemTask systemTask, String taskId) {
-        // TaskModel task = loadTaskQuietly(taskId);
         TaskModel task = loadLeanTaskQuietly(taskId);
 
         if (task == null) {
@@ -137,13 +136,13 @@ public class AsyncSystemTaskExecutor {
 
             // Load the full task including externalized payloads for execution
             if (task.getStatus() == TaskModel.Status.SCHEDULED) {
-                task = loadTaskQuietly(taskId);
+                task = executionDAOFacade.populateLeanTask(task);
                 task.setStartTime(System.currentTimeMillis());
                 Monitors.recordQueueWaitTime(task.getTaskDefName(), task.getQueueWaitTime());
                 systemTask.start(workflow, task, workflowExecutor);
             } else if (task.getStatus() == TaskModel.Status.IN_PROGRESS) {
                 if (systemTask.isTaskRetrievalRequired()) {
-                    task = loadTaskQuietly(taskId);
+                    task = executionDAOFacade.populateLeanTask(task);
                 }
                 systemTask.execute(workflow, task, workflowExecutor);
             }
@@ -199,15 +198,7 @@ public class AsyncSystemTaskExecutor {
 
     private TaskModel loadLeanTaskQuietly(String taskId) {
         try {
-            return executionDAOFacade.getTaskModelLean(taskId);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private TaskModel loadTaskQuietly(String taskId) {
-        try {
-            return executionDAOFacade.getTaskModel(taskId);
+            return executionDAOFacade.getLeanTaskModel(taskId);
         } catch (Exception e) {
             return null;
         }

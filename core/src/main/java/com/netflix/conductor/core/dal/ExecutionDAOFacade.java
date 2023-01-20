@@ -436,8 +436,12 @@ public class ExecutionDAOFacade {
         return taskModel;
     }
 
-    public TaskModel getTaskModelLean(String taskId) {
+    public TaskModel getLeanTaskModel(String taskId) {
         return getTaskFromDatastore(taskId);
+    }
+
+    public TaskModel populateLeanTask(TaskModel taskModel) {
+        return modelMapper.getFullCopy(taskModel);
     }
 
     public Task getTask(String taskId) {
