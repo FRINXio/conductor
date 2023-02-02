@@ -62,4 +62,11 @@ include 'java-sdk'
 
 include 'test-harness'
 
+fileTree('.') {
+    include 'conductor-community/**/build.gradle'
+    exclude 'conductor-community/build.gradle' // Exclude the root build file.
+    exclude 'conductor-community/archive' // Exclude the root build file.
+}.collect { relativePath(it.parent).replace(File.separator, ':') }
+        .each { include(it) }
+
 rootProject.children.each {it.name="conductor-${it.name}"}
