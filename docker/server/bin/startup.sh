@@ -42,4 +42,4 @@ if [ -f "/set_env_secrets.sh" ]; then
 . /set_env_secrets.sh
 fi
 
-java ${JAVA_OPTS} -jar ${LOG4J_CONF:-} -DCONDUCTOR_CONFIG_FILE=$config_file conductor-server-*-boot.jar
+java ${JAVA_OPTS} -jar ${LOG4J_CONF:-} -DCONDUCTOR_CONFIG_FILE=$config_file *-boot.jar
