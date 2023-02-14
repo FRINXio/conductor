@@ -22,9 +22,10 @@ dependencies {
     implementation project(':conductor-grpc-server')
     implementation project(':conductor-http-task')
     implementation project(':conductor-json-jq-task')
+    implementation project(':conductor-es6-persistence')
 
     // Dependencies from conductor-community below 
-    implementation project(':conductor-community:archive')
+//    implementation project(':conductor-community:archive')
     implementation project(':conductor-community:metrics')
     implementation project(':conductor-community:external-payload-storage:postgres-external-storage')
     implementation project(':conductor-community:persistence:postgres-persistence')

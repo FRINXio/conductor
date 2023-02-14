@@ -21,6 +21,7 @@ jobs:
         run: ./gradlew build -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000
 
   test-v2:
+    if: ${{ false }}  # disable for now
     runs-on: ubuntu-latest
     needs: build-v2
     

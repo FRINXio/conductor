@@ -56,7 +56,7 @@ ext {
     // Dependencies for conductor-community
     revLog4J= '2.17.1!!'
     revSpectator = '0.122.0'
-    revLucene = '8.9.0'
+//    revLucene = '8.9.0'
     revPrometheus = '0.9.0'
     revMicrometer = '1.6.2'
     revAmqpClient = '5.13.0'
