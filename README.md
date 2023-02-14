@@ -14,6 +14,42 @@ FRINX fork of conductor community: https://github.com/FRINXio/conductor-communit
 
 Conductor/server produces a build specific to us. We do not build / test all the components.
 
+## Debugging conductor locally
+
+To run and debug conductor locally follow these steps:
+
+1. Start empty postgres and elasticsearch containers
+
+```
+docker rm -f elasticsearch && docker rm -f psql && docker run -d --name elasticsearch  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:6.7.1 && docker run --name psql -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
+```
+
+> **Note**
+> Conductor can run with different databases.
+> In this case we are assuming primaryDB == postgres && indexDB == elastic v. 6
+> In case both primary and index DB are postgres, there's no need to run elasticsearch
+
+2. Run conductor
+```
+./gradlew bootRun --debug-jvm
+```
+
+> **Note**
+> Configuration used is located here: `server/src/main/resources/application.properties`
+
+3. Attach debugger from your favourite IDE
+4. Run some workers. Our base workers can be started with:
+```
+git clone git@github.com:FRINXio/fm-workflows.git
+cd fm-workflows/
+cd demo-workflows/
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt 
+cd workers
+CONDUCTOR_URL_BASE=http://localhost:8080/api python3 ./main.py
+```
+
 # Conductor
 Conductor is a platform created by Netflix to orchestrate workflows that span across microservices.
 
