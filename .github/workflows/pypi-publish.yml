@@ -6,9 +6,9 @@ on:
     branches:
       - master
 
-    # Publish `v1.2.3` tags as releases.
+    # Publish `vfrinx2.0.1` tags as releases.
     tags:
-      - v2*
+      - vfrinx2*
   
   workflow_dispatch:
 
