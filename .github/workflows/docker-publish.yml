@@ -6,9 +6,9 @@ on:
     branches:
       - master
 
-    # Publish `v2.0.3` tags as releases.
+    # Publish `vfrinx2.0.3` tags as releases.
     tags:
-      - v2*
+      - vfrinx2*
 
 env:
   # TODO: Change variable to your image's name.
@@ -44,7 +44,7 @@ jobs:
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^vfrinx//')
 
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
