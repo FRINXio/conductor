@@ -68,7 +68,7 @@ include ':conductor-community:metrics'
 include ':conductor-community:test-util'
 include ':conductor-community:persistence:common-persistence'
 include ':conductor-community:persistence:postgres-persistence'
-//include ':conductor-community:archive'
+include ':conductor-community:archive'
 
 (rootProject.children).each {
     if(it.name == "conductor-community") {
