@@ -99,7 +99,7 @@ public class WorkflowTask {
     private String dynamicForkTasksInputParamName;
 
     @ProtoField(id = 12)
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    // @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<@Valid WorkflowTask> defaultCase = new LinkedList<>();
 
     @ProtoField(id = 13)
