@@ -201,7 +201,7 @@ configure(allprojects - project(':conductor-grpc') - allprojects.findAll {it.dis
     }
 }
 
-['cassandra-persistence', 'core', 'test-harness', 'client'].each {
+['core', 'test-harness', 'client'].each {
     configure(project(":conductor-$it")) {
         spotless {
             groovy {
