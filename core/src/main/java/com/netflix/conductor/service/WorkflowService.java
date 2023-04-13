@@ -397,4 +397,8 @@ public interface WorkflowService {
      */
     ExternalStorageLocation getExternalStorageLocation(
             String path, String operation, String payloadType);
+
+    List<String> getWorkflowPath(String workflowId);
+
+    List<Workflow> getWorkflowFamily(String workflowId, boolean summaryOnly);
 }

@@ -154,6 +154,16 @@ public class ExecutionDAOFacade {
         return getWorkflowModelFromDataStore(workflowId, includeTasks).toWorkflow();
     }
 
+    public List<Workflow> getWorkflowFamily(String workflowId, boolean summaryOnly) {
+        return executionDAO.getWorkflowFamily(workflowId, summaryOnly).stream()
+                .map(WorkflowModel::toWorkflow)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getWorkflowPath(String workflowId) {
+        return executionDAO.getWorkflowPath(workflowId);
+    }
+
     private WorkflowModel getWorkflowModelFromDataStore(String workflowId, boolean includeTasks) {
         WorkflowModel workflow = executionDAO.getWorkflow(workflowId, includeTasks);
         if (workflow == null) {

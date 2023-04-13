@@ -374,6 +374,10 @@ public class ExecutionService {
         return executionDAOFacade.getWorkflow(workflowId, includeTasks);
     }
 
+    public List<Workflow> getExecutionFamily(String workflowId, boolean summaryOnly) {
+        return executionDAOFacade.getWorkflowFamily(workflowId, summaryOnly);
+    }
+
     public List<String> getRunningWorkflows(String workflowName, int version) {
         return executionDAOFacade.getRunningWorkflowIds(workflowName, version);
     }
@@ -602,5 +606,9 @@ public class ExecutionService {
             LOGGER.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
+    }
+
+    public List<String> getWorkflowPath(String workflowId) {
+        return executionDAOFacade.getWorkflowPath(workflowId);
     }
 }

@@ -145,6 +145,11 @@ public interface ExecutionDAO {
      */
     WorkflowModel getWorkflow(String workflowId, boolean includeTasks);
 
+    default List<String> getWorkflowPath(String workflowId) {
+        throw new UnsupportedOperationException(
+                "Not supported in this context: " + this.getClass().getName());
+    }
+
     /**
      * @param workflowName name of the workflow
      * @param version the workflow version
@@ -213,4 +218,8 @@ public interface ExecutionDAO {
      * @param eventExecution Event execution to be removed
      */
     void removeEventExecution(EventExecution eventExecution);
+
+    default List<WorkflowModel> getWorkflowFamily(String workflowId, boolean summaryOnly) {
+        throw new UnsupportedOperationException();
+    }
 }
