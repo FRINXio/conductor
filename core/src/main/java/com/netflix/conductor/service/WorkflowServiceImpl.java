@@ -186,6 +186,15 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflow;
     }
 
+    @Override
+    public List<Workflow> getWorkflowFamily(String workflowId, boolean summaryOnly) {
+        List<Workflow> workflows = executionService.getExecutionFamily(workflowId, summaryOnly);
+        if (workflows == null) {
+            throw new NotFoundException("Workflow family for id: %s not found.", workflowId);
+        }
+        return workflows;
+    }
+
     /**
      * Removes the workflow from the system.
      *
@@ -457,5 +466,10 @@ public class WorkflowServiceImpl implements WorkflowService {
     public ExternalStorageLocation getExternalStorageLocation(
             String path, String operation, String type) {
         return executionService.getExternalStorageLocation(path, operation, type);
+    }
+
+    @Override
+    public List<String> getWorkflowPath(String workflowId) {
+        return executionService.getWorkflowPath(workflowId);
     }
 }
