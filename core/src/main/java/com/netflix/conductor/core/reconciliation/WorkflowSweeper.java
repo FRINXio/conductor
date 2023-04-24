@@ -108,7 +108,10 @@ public class WorkflowSweeper {
             LOGGER.warn(
                     "Workflow with {} id can not be found. Attempting to unack using the id",
                     workflowId);
-            queueDAO.setUnackTimeout(DECIDER_QUEUE, workflowId, workflowOffsetTimeout * 1000);
+            queueDAO.setUnackTimeout(
+                    DECIDER_QUEUE,
+                    workflowId,
+                    workflowOffsetTimeout * properties.getSweeperUnackTimeoutMultiplier());
         }
     }
 

@@ -45,6 +45,9 @@ public class ConductorProperties {
     /** The number of threads to use to do background sweep on active workflows. */
     private int sweeperThreadCount = Runtime.getRuntime().availableProcessors() * 2;
 
+    /** The number of the timeout multiplier for unacknowledged workflows in the queue. */
+    private int sweeperUnackTimeoutMultiplier = 1000;
+
     /** The number of threads to configure the threadpool in the event processor. */
     private int eventProcessorThreadCount = 2;
 
@@ -248,6 +251,14 @@ public class ConductorProperties {
 
     public void setSweeperThreadCount(int sweeperThreadCount) {
         this.sweeperThreadCount = sweeperThreadCount;
+    }
+
+    public int getSweeperUnackTimeoutMultiplier() {
+        return sweeperUnackTimeoutMultiplier;
+    }
+
+    public void setSweeperUnackTimeoutMultiplier(int sweeperUnackTimeoutMultiplier) {
+        this.sweeperUnackTimeoutMultiplier = sweeperUnackTimeoutMultiplier;
     }
 
     public int getEventProcessorThreadCount() {
