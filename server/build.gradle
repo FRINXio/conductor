@@ -19,7 +19,7 @@ dependencies {
 
     implementation project(':conductor-rest')
     implementation project(':conductor-core')
-    implementation project(':conductor-grpc-server')
+    //implementation project(':conductor-grpc-server')
     implementation project(':conductor-http-task')
     implementation project(':conductor-json-jq-task')
 
