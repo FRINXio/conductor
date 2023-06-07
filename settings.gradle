@@ -54,9 +54,9 @@ include 'json-jq-task'
 include 'http-task'
 
 include 'rest'
-include 'grpc'
-include 'grpc-server'
-include 'grpc-client'
+//include 'grpc'
+//include 'grpc-server'
+//include 'grpc-client'
 
 //include 'java-sdk'
 
