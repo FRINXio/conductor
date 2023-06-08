@@ -1,7 +1,8 @@
 # General
 
 # Backend 
-server/build/libs
+**/build
+*/build
 
 # UI
 **/node_modules
