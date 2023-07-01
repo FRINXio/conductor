@@ -5,7 +5,7 @@
 # ===========================================================================================================
 # 0. Builder stage
 # ===========================================================================================================
-FROM eclipse-temurin:11-jdk-focal AS builder
+FROM eclipse-temurin:11-jdk-jammy AS builder
 
 LABEL maintainer="Netflix OSS <conductor@netflix.com>"
 
@@ -19,7 +19,7 @@ RUN ./gradlew -Prelease.version=2.0.0-SNAPSHOT build -Dhttp.socketTimeout=60000 
 # ===========================================================================================================
 # 1. Bin stage
 # ===========================================================================================================
-FROM eclipse-temurin:11-jre-focal 
+FROM eclipse-temurin:11-jre-jammy 
 
 ARG git_commit=unspecified
 LABEL git_commit="${git_commit}"
