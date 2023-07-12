@@ -1026,14 +1026,18 @@ public class WorkflowExecutor {
                             systemTaskRegistry.get(task.getTaskType());
                     if (!workflowSystemTask.isAsync()
                             && workflowSystemTask.execute(workflow, task, this)) {
-                        tasksToBeUpdated.add(task);
-                        stateChanged = true;
+                        // State change and adding system tasks handled in scheduleTask()
+//                        tasksToBeUpdated.add(task);
+//                        stateChanged = true;
                     }
                 }
             }
 
-            if (!outcome.tasksToBeUpdated.isEmpty() || !tasksToBeScheduled.isEmpty()) {
-                executionDAOFacade.updateTasks(tasksToBeUpdated);
+            List<TaskModel> systemTasks = createIfExist(tasksToBeUpdated);
+            systemTasks = addSystemTasksIntoList(tasksToBeUpdated, systemTasks);
+
+            if (systemTasks != null) {
+                executionDAOFacade.updateTasks(systemTasks);
             }
 
             if (stateChanged) {
@@ -1054,6 +1058,30 @@ public class WorkflowExecutor {
             LOGGER.error("Error deciding workflow: {}", workflow.getWorkflowId(), e);
             throw e;
         }
+    }
+
+    private List<TaskModel> createIfExist(List<TaskModel> tasksToBeUpdated) {
+        for (TaskModel t : tasksToBeUpdated) {
+            if (systemTaskRegistry.isSystemTask(t.getTaskType())) {
+                return new ArrayList<>();
+            }
+        }
+        return null;
+    }
+
+    private List<TaskModel> addSystemTasksIntoList(List<TaskModel> tasks, List<TaskModel> systemTasks) {
+        if (!tasks.isEmpty() && systemTasks != null) {
+            for (TaskModel t : tasks) {
+                if (systemTaskRegistry.isSystemTask(t.getTaskType())) {
+                    WorkflowSystemTask workflowSystemTask = systemTaskRegistry.get(t.getTaskType());
+                    if (!workflowSystemTask.isAsync()) {
+                        systemTasks.add(t);
+                    }
+                }
+            }
+            return systemTasks;
+        }
+        return null;
     }
 
     private void adjustStateIfSubWorkflowChanged(WorkflowModel workflow) {
@@ -1461,7 +1489,10 @@ public class WorkflowExecutor {
                         throw new NonTransientException(errorMsg, e);
                     }
                     startedSystemTasks = true;
-                    executionDAOFacade.updateTask(task);
+                    // Prevent doubling metrics for terminal system tasks
+                    if (!task.getStatus().isTerminal()) {
+                        executionDAOFacade.updateTask(task);
+                    }
                 } else {
                     tasksToBeQueued.add(task);
                 }
@@ -1520,9 +1551,11 @@ public class WorkflowExecutor {
                 failureWorkflow = (String) workflow.getInput().get(name);
             }
         }
-        if (terminateWorkflowException.getTask() != null) {
-            executionDAOFacade.updateTask(terminateWorkflowException.getTask());
-        }
+        // Prevent doubling metrics when task is terminated,
+        // failed tasks enter ExecutionDAO in updateTask method
+//        if (terminateWorkflowException.getTask() != null) {
+//            executionDAOFacade.updateTask(terminateWorkflowException.getTask());
+//        }
         return terminateWorkflow(
                 workflow, terminateWorkflowException.getMessage(), failureWorkflow);
     }
