@@ -126,6 +126,8 @@ public class Workflow extends Auditable {
     @ProtoField(id = 25)
     private Set<String> failedTaskNames = new HashSet<>();
 
+    private Boolean completedWithErrors;
+
     public Workflow() {}
 
     /**
@@ -379,6 +381,14 @@ public class Workflow extends Auditable {
             throw new IllegalArgumentException("priority MUST be between 0 and 99 (inclusive)");
         }
         this.priority = priority;
+    }
+
+    public Boolean getCompletedWithErrors() {
+        return completedWithErrors;
+    }
+
+    public void setCompletedWithErrors(Boolean completedWithErrors) {
+        this.completedWithErrors = completedWithErrors;
     }
 
     /**
