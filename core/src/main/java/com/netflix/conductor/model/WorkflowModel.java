@@ -108,6 +108,7 @@ public class WorkflowModel {
 
     private Status previousStatus;
 
+    private Boolean completedWithErrors;
     @JsonIgnore private Map<String, Object> input = new HashMap<>();
 
     @JsonIgnore private Map<String, Object> output = new HashMap<>();
@@ -122,6 +123,14 @@ public class WorkflowModel {
 
     public void setPreviousStatus(Status status) {
         this.previousStatus = status;
+    }
+
+    public Boolean getCompletedWithErrors() {
+        return completedWithErrors;
+    }
+
+    public void setCompletedWithErrors(Boolean completedWithErrors) {
+        this.completedWithErrors = completedWithErrors;
     }
 
     public Status getStatus() {
@@ -573,6 +582,7 @@ public class WorkflowModel {
         workflow.setStatus(Workflow.WorkflowStatus.valueOf(this.status.name()));
         workflow.setTasks(tasks.stream().map(TaskModel::toTask).collect(Collectors.toList()));
         workflow.setUpdateTime(this.updatedTime);
+        workflow.setCompletedWithErrors(this.completedWithErrors);
 
         // ensure that input/output is properly represented
         if (externalInputPayloadStoragePath != null) {
