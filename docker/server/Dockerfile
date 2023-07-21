@@ -21,7 +21,7 @@ RUN ./gradlew -Prelease.version=2.0.0-SNAPSHOT build -Dhttp.socketTimeout=60000 
 # ===========================================================================================================
 FROM eclipse-temurin:11-jre-focal 
 
-ARG git_commit
+ARG git_commit=unspecified
 LABEL git_commit="${git_commit}"
 LABEL maintainer="Netflix OSS <conductor@netflix.com>"
 
