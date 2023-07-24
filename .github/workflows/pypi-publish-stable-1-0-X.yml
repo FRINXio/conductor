@@ -16,6 +16,7 @@ jobs:
   build-n-publish-v1:
     name: Build and publish frinx conductor client
     runs-on: ubuntu-18.04
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: ./polyglot-clients/python
