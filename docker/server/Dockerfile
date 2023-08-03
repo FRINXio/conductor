@@ -24,6 +24,7 @@ FROM eclipse-temurin:11-jre-focal
 ARG git_commit=unspecified
 LABEL git_commit="${git_commit}"
 LABEL maintainer="Netflix OSS <conductor@netflix.com>"
+LABEL org.opencontainers.image.source="https://github.com/FRINXio/conductor"
 
 # Make app folders
 RUN mkdir -p /app/config /app/logs /app/libs
