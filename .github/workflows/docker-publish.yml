@@ -28,7 +28,7 @@ jobs:
           submodules: recursive
 
       - name: Build image
-        run: docker build . --file docker/server/Dockerfile --tag $IMAGE_NAME --build-arg git_commit=$(git describe --tags)
+        run: docker build . --file docker/server/Dockerfile --tag $IMAGE_NAME --build-arg git_commit=$(git rev-parse HEAD)
 
       - name: Log into docker hub
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
