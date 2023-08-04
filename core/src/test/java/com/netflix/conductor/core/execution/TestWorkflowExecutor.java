@@ -2073,7 +2073,6 @@ public class TestWorkflowExecutor {
         successTask.setTaskId("taskid1");
         successTask.setReferenceTaskName("success");
         successTask.setStatus(TaskModel.Status.COMPLETED);
-        successTask.setTaskType(TASK_TYPE_LAMBDA);
 
         TaskModel failedTask = new TaskModel();
         failedTask.setTaskId("taskid2");

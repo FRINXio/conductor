@@ -336,7 +336,6 @@ public class HttpTaskTest {
         task.setStatus(TaskModel.Status.SCHEDULED);
         task.getInputData().remove(HttpTask.REQUEST_PARAMETER_NAME);
         task.setReferenceTaskName("t1");
-        task.setTaskType(TaskType.TASK_TYPE_HTTP);
         httpTask.start(workflow, task, workflowExecutor);
         assertEquals(TaskModel.Status.FAILED, task.getStatus());
         assertEquals(HttpTask.MISSING_REQUEST, task.getReasonForIncompletion());
