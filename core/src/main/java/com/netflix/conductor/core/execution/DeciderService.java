@@ -44,7 +44,6 @@ import com.netflix.conductor.metrics.Monitors;
 import com.netflix.conductor.model.TaskModel;
 import com.netflix.conductor.model.WorkflowModel;
 
-import static com.netflix.conductor.common.metadata.tasks.TaskType.TASK_TYPE_SUB_WORKFLOW;
 import static com.netflix.conductor.common.metadata.tasks.TaskType.TERMINATE;
 import static com.netflix.conductor.common.metadata.tasks.TaskType.USER_DEFINED;
 import static com.netflix.conductor.model.TaskModel.Status.*;
@@ -131,6 +130,10 @@ public class DeciderService {
             return outcome;
         }
 
+        if (workflow.getCompletedWithErrors() == null) {
+            workflow.setCompletedWithErrors(false);
+        }
+
         List<TaskModel> pendingTasks = new ArrayList<>();
         Set<String> executedTaskRefNames = new HashSet<>();
         boolean hasSuccessfulTerminateTask = false;
@@ -212,12 +215,6 @@ public class DeciderService {
                     pendingTask.setStatus(COMPLETED_WITH_ERRORS);
                     workflow.setCompletedWithErrors(true);
                 }
-            }
-
-            if (pendingTask.getTaskType().equals(TASK_TYPE_SUB_WORKFLOW)
-                    && !pendingTask.getStatus().equals(COMPLETED_WITH_ERRORS)
-                    && workflow.getCompletedWithErrors() == null) {
-                workflow.setCompletedWithErrors(false);
             }
 
             if (!pendingTask.isExecuted()
