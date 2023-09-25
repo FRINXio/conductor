@@ -37,7 +37,7 @@ import com.netflix.conductor.validations.ValidationContext;
 
 @Service
 public class MetadataServiceImpl implements MetadataService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetadataServiceImpl.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(MetadataServiceImpl.class);
     private final MetadataDAO metadataDAO;
     private final EventHandlerDAO eventHandlerDAO;
 
@@ -122,18 +122,25 @@ public class MetadataServiceImpl implements MetadataService {
     /**
      * @param workflowDefList Workflow definitions to be updated.
      */
-    public BulkResponse updateWorkflowDef(List<WorkflowDef> workflowDefList) {
-        BulkResponse bulkResponse = new BulkResponse();
+//    public BulkResponse updateWorkflowDef(List<WorkflowDef> workflowDefList) {
+//        BulkResponse bulkResponse = new BulkResponse();
+//        for (WorkflowDef workflowDef : workflowDefList) {
+//            try {
+//                updateWorkflowDef(workflowDef);
+//                bulkResponse.appendSuccessResponse(workflowDef.getName());
+//            } catch (Exception e) {
+//                LOGGER.error("bulk update workflow def failed, name {} ", workflowDef.getName(), e);
+//                bulkResponse.appendFailedResponse(workflowDef.getName(), e.getMessage());
+//            }
+//        }
+//        return bulkResponse;
+//    }
+
+    public void updateWorkflowDef(List<WorkflowDef> workflowDefList) {
         for (WorkflowDef workflowDef : workflowDefList) {
-            try {
-                updateWorkflowDef(workflowDef);
-                bulkResponse.appendSuccessResponse(workflowDef.getName());
-            } catch (Exception e) {
-                LOGGER.error("bulk update workflow def failed, name {} ", workflowDef.getName(), e);
-                bulkResponse.appendFailedResponse(workflowDef.getName(), e.getMessage());
-            }
+            workflowDef.setUpdateTime(System.currentTimeMillis());
+            metadataDAO.updateWorkflowDef(workflowDef);
         }
-        return bulkResponse;
     }
 
     /**

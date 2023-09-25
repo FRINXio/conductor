@@ -31,7 +31,6 @@ import com.netflix.conductor.common.model.BulkResponse;
 import com.netflix.conductor.common.run.SearchResult;
 import com.netflix.conductor.common.run.Workflow;
 import com.netflix.conductor.common.run.WorkflowSummary;
-import com.netflix.conductor.common.run.WorkflowTestRequest;
 import com.netflix.conductor.common.utils.ExternalPayloadStorage;
 
 import com.sun.jersey.api.client.ClientHandler;
@@ -492,14 +491,5 @@ public class WorkflowClient extends ClientBase {
                     "start", start, "size", size, "sort", sort, "freeText", freeText, "query", query
                 };
         return getForEntity("workflow/search-v2", params, searchResultWorkflow);
-    }
-
-    public Workflow testWorkflow(WorkflowTestRequest testRequest) {
-        Validate.notNull(testRequest, "testRequest cannot be null");
-        if (testRequest.getWorkflowDef() != null) {
-            testRequest.setName(testRequest.getWorkflowDef().getName());
-            testRequest.setVersion(testRequest.getWorkflowDef().getVersion());
-        }
-        return postForEntity("workflow/test", testRequest, null, Workflow.class);
     }
 }

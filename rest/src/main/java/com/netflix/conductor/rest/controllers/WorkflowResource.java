@@ -32,13 +32,11 @@ import com.netflix.conductor.common.metadata.workflow.SkipTaskRequest;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.run.*;
 import com.netflix.conductor.service.WorkflowService;
-import com.netflix.conductor.service.WorkflowTestService;
 
 import io.swagger.v3.oas.annotations.Operation;
 
 import static com.netflix.conductor.rest.config.RequestMappingConstants.WORKFLOW;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RestController
@@ -47,12 +45,8 @@ public class WorkflowResource {
 
     private final WorkflowService workflowService;
 
-    private final WorkflowTestService workflowTestService;
-
-    public WorkflowResource(
-            WorkflowService workflowService, WorkflowTestService workflowTestService) {
+    public WorkflowResource(WorkflowService workflowService) {
         this.workflowService = workflowService;
-        this.workflowTestService = workflowTestService;
     }
 
     @PostMapping(produces = TEXT_PLAIN_VALUE)
@@ -291,11 +285,5 @@ public class WorkflowResource {
             @RequestParam("operation") String operation,
             @RequestParam("payloadType") String payloadType) {
         return workflowService.getExternalStorageLocation(path, operation, payloadType);
-    }
-
-    @PostMapping(value = "test", produces = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Test workflow execution using mock data")
-    public Workflow testWorkflow(@RequestBody WorkflowTestRequest request) {
-        return workflowTestService.testWorkflow(request);
     }
 }
