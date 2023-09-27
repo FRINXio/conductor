@@ -59,8 +59,8 @@ public class MetadataResource {
 
     @PutMapping("/workflow")
     @Operation(summary = "Create or update workflow definition")
-    public void update(@RequestBody List<WorkflowDef> workflowDefs) {
-        metadataService.updateWorkflowDef(workflowDefs);
+    public BulkResponse update(@RequestBody List<WorkflowDef> workflowDefs) {
+        return metadataService.updateWorkflowDef(workflowDefs);
     }
 
     @Operation(summary = "Retrieves workflow definition along with blueprint")

@@ -77,9 +77,5 @@ public class ApplicationExceptionMapper {
                 exception.getClass().getSimpleName(),
                 request.getRequestURI(),
                 exception);
-        exception.getStackTrace();
-        exception.printStackTrace();
-        System.out.println("Request error: " + request.getRequestURI().intern());
-        System.out.println("Request error URL: " + request.getRequestURL().toString());
     }
 }
