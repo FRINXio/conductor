@@ -12,7 +12,6 @@
  */
 package com.netflix.conductor;
 
-import com.netflix.conductor.contribs.metrics.DatadogMetricsConfiguration;
 import java.io.IOException;
 import java.util.Properties;
 
