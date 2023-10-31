@@ -34,7 +34,7 @@ dependencies {
     testImplementation "redis.clients:jedis:${revJedis}"
     testImplementation "com.netflix.dyno-queues:dyno-queues-redis:${revDynoQueues}"
 
-    testImplementation "org.codehaus.groovy:groovy-all:${revGroovy}"
+    testImplementation "org.apache.groovy:groovy-all:${revGroovy}"
     testImplementation "org.spockframework:spock-core:${revSpock}"
     testImplementation "org.spockframework:spock-spring:${revSpock}"
 
@@ -49,9 +49,9 @@ dependencies {
     testImplementation "org.testcontainers:elasticsearch:${revTestContainer}"
     testImplementation('junit:junit:4.13.2')
     testImplementation "org.junit.vintage:junit-vintage-engine"
-    testImplementation "javax.ws.rs:javax.ws.rs-api:${revJAXRS}"
+    testImplementation 'jakarta.servlet:jakarta.servlet-api'
     testImplementation "org.glassfish.jersey.core:jersey-common:${revJerseyCommon}"
-    testImplementation "javax.servlet:javax.servlet-api:4.0.1"
+    testImplementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${revSpringDoc}"
 }
 
 test {

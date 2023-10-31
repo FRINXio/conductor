@@ -15,8 +15,6 @@ package com.netflix.conductor.rest.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -34,6 +32,7 @@ import com.netflix.conductor.core.utils.Utils;
 import com.netflix.conductor.metrics.Monitors;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 @Order(ValidationExceptionMapper.ORDER + 1)
@@ -59,7 +58,8 @@ public class ApplicationExceptionMapper {
 
         if (th instanceof HttpClientErrorException httpExc) {
             ErrorResponse errorResponse =
-                    createUnathorizedErrorResponse(request, httpExc, httpExc.getStatusCode());
+                    createUnathorizedErrorResponse(
+                            request, httpExc, (HttpStatus) httpExc.getStatusCode());
             return new ResponseEntity<>(errorResponse, httpExc.getStatusCode());
         }
 

@@ -16,7 +16,7 @@ WORKDIR /conductor
 RUN apt-get update && apt-get install -y git
 
 # Build the server on run
-RUN ./gradlew -Prelease.version=2.0.0-SNAPSHOT build -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000 -x test
+RUN ./gradlew -Prelease.version=2.25.4 build -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000 -x test
 
 # ===========================================================================================================
 # 1. Bin stage
