@@ -37,6 +37,7 @@ import com.netflix.conductor.common.metadata.tasks.Task.Status;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.common.metadata.tasks.TaskType;
+import com.netflix.conductor.common.metadata.workflow.SkipTaskRequest;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
@@ -266,7 +267,8 @@ public abstract class AbstractHttpEndToEndTest extends AbstractEndToEndTest {
         assertEquals(WorkflowStatus.RUNNING, workflow.getStatus());
         assertEquals(1, workflow.getTasks().size());
 
-        workflowClient.skipTaskFromWorkflow(workflowId, "t1");
+        SkipTaskRequest skipTaskRequest = new SkipTaskRequest();
+        workflowClient.skipTaskFromWorkflow(workflowId, "t1", skipTaskRequest);
     }
 
     @Test(expected = ConductorClientException.class)
