@@ -29,7 +29,8 @@ dependencies {
     implementation project(':conductor-community:external-payload-storage:postgres-external-storage')
     implementation project(':conductor-community:persistence:postgres-persistence')
     implementation project(':conductor-community:persistence:common-persistence')
- 
+
+    implementation "org.postgresql:postgresql:${revPostgres}"
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
