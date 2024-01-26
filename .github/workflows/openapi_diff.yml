@@ -1,0 +1,29 @@
+name: pr-check
+
+on:
+  pull_request:
+    branches: [ swagger_docs ]
+
+  workflow_dispatch:
+
+jobs:
+  diff:
+    name: OpenAPI diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out head branch
+        uses: actions/checkout@v3
+        with:
+          path: head
+      - name: Check out swagger_docs branch
+        uses: actions/checkout@v3
+        with:
+          ref: swagger_docs
+          path: base
+      - name: Run OpenAPI Diff (from HEAD revision)
+        uses: docker://openapitools/openapi-diff:latest 
+        with:
+          args: --json diff.json base/latest.json head/latest.json
+      - name: print diff
+        run: cat diff.json
