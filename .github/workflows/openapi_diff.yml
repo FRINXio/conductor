@@ -1,0 +1,64 @@
+name: Swagger notiication
+
+on:
+  push:
+    branches:
+      - swagger_docs
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      json-file: ${{ steps.json-file.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: json-file
+        with:
+          filters: |
+            latest:
+              - 'latest.json'
+            staging:
+              - 'staging.json'
+            production:
+              - 'production.json'
+          base: ${{ github.ref }}
+
+  diff:
+    name: OpenAPI diff
+    runs-on: ubuntu-latest
+    needs: changes
+    timeout-minutes: 5
+    if: ${{ needs.changes.outputs.json-file != '[]' && needs.changes.outputs.json-file != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        changed-apis: ${{ fromJSON(needs.changes.outputs.json-file) }}
+    steps:
+      - name: Check out head branch
+        uses: actions/checkout@v4
+        with:
+          path: head
+
+      - name: Check out swagger_docs branch
+        uses: actions/checkout@v4
+        with:
+          ref: swagger_docs
+          path: base
+          fetch-depth: 2
+
+      - name: Check out swagger_docs branch
+        run: cd base && git checkout HEAD^ && cd ..
+
+      - name: Run OpenAPI Diff (from HEAD revision)
+        uses: docker://openapitools/openapi-diff:latest 
+        with:
+          args: --json diff.json --text diff.txt base/${{ matrix.changed-apis }}.json head/${{ matrix.changed-apis }}.json
+        env:
+          JSON_FILE:  ${{ matrix.changed-apis }}
+
+      - name: print diff
+        run: |
+          cp head/slack.sh .
+          ./slack.sh ${{ matrix.changed-apis }} ${{ secrets.API_SLACK_WEBHOOK_URL }}
