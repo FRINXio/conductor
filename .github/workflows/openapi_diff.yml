@@ -19,10 +19,8 @@ jobs:
           filters: |
             latest:
               - 'latest.json'
-            staging:
-              - 'staging.json'
-            production:
-              - 'production.json'
+            stable-latest:
+              - 'stable-latest.json'
           base: ${{ github.ref }}
 
   diff:
