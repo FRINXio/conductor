@@ -80,8 +80,17 @@ jobs:
 
       #### OpenAPI publish ####
 
+      - name: Check conductor health
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 10
+          max_attempts: 10
+          retry_on: error
+          command: |
+            curl -X 'GET' 'http://localhost:8080/health' -H 'accept: */*' | grep '"healthy":true'
+
       - name: Get conductor openapi spec
-        run: sleep 10 && curl http://localhost:8080/v3/api-docs -o openapi.json
+        run: curl http://localhost:8080/v3/api-docs -o openapi.json
 
       - name: Check out swagger_docs branch
         uses: actions/checkout@v4
