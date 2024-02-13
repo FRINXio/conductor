@@ -2,17 +2,14 @@ name: Docker
 
 on:
   push:
-    # Publish `master` as Docker `latest` image.
     branches:
-      - master
+      - 'master'  # produce latest image
+      - '[0-9]+.X-stable'  # produce stable-latest image
 
-    # Publish `vfrinx2.0.3` tags as releases.
     tags:
-      - vfrinx2*
-
-  workflow_dispatch:
-
-
+    - 'vfrinx-[0-9]+.[0-9]+.[0-9]'  # produce release image (6.0.0)
+    - 'vfrinx-[0-9]+.[0-9]+.[0-9]-stable'  # produce stable release image (5.1.0)
+    
 env:
   # TODO: Change variable to your image's name.
   IMAGE_NAME: frinx/conductor-server
@@ -20,55 +17,97 @@ env:
 jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
-  push-v2:
+  build-image-v2:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
+    # Dependency for swagger export
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
-
-      - name: Build image
-        run: docker build . --file docker/server/Dockerfile --tag $IMAGE_NAME --build-arg git_commit=$(git rev-parse HEAD)
+          submodules: recursive  # fetch submodules
 
       - name: Log into docker hub
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
-      - name: Push image
+      - name: Build image
+        run: docker build . --file docker/server/Dockerfile --tag $IMAGE_NAME:latest --build-arg git_commit=$(git rev-parse HEAD)
+
+      # Start conductor for swagger export with network to postgres service
+      - name: Run conductor image
+        run: docker run -d --network "$(docker network ls --filter type=custom --format '{{ .Name }}')" --publish 8080:8080 $IMAGE_NAME:latest
+
+      #### Set tags based on source type ####
+
+      - name: Set tag for latest image
+        if: github.ref_type == 'branch' && startsWith(github.ref, 'refs/heads/master')
         run: |
-          IMAGE_ID=$IMAGE_NAME
+          echo "IMAGE_TAG=$(echo 'latest')" >> "$GITHUB_ENV"
 
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+      - name: Set tag for stable-latest image
+        if: github.ref_type == 'branch' && endsWith(github.ref, '-stable')
+        run: |
+          echo "IMAGE_TAG=$(echo 'stable-latest')" >> "$GITHUB_ENV"
 
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+      - name: Set tag for stable-release image
+        if: github.ref_type == 'tag' && endsWith(github.ref, '-stable')
+        run: |
+          echo "IMAGE_TAG=$(echo $GITHUB_REF | cut -d / -f 3 | sed -e 's/^vfrinx-//' | sed -e 's/-stable//')" >> "$GITHUB_ENV"
 
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^vfrinx//')
+      - name: Set tag for release image
+        if: ${{ github.ref_type == 'tag' && !endsWith(github.ref, '-stable') }}
+        run: |
+          echo "IMAGE_TAG=$(echo $GITHUB_REF | cut -d / -f 3 | sed -e 's/^vfrinx-//')" >> "$GITHUB_ENV"
 
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
+      # Tag and publish docker image
+      - name: Push stable-release image
+        run: |
+          docker tag $IMAGE_NAME:latest $IMAGE_NAME:${IMAGE_TAG}
+          docker push $IMAGE_NAME:${IMAGE_TAG}
 
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
+      #### OpenAPI publish ####
 
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+      - name: Check conductor health
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 10
+          max_attempts: 10
+          retry_on: error
+          command: |
+            curl -X 'GET' 'http://localhost:8080/health' -H 'accept: */*' | grep '"healthy":true'
 
-          # Add latest tag if we are on master and github.ref points to a tag
-          if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
-            MASTER=$(git show-ref --hash origin/master)
-            echo "master: $MASTER"
-            HEAD=$(git rev-parse HEAD)
-            echo "head: $HEAD"
-            echo "github.ref ${{ github.ref }}"
-            if [[ $MASTER == $HEAD ]]; then
-              VERSION=latest
-              echo VERSION=$VERSION
-              docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-              docker push $IMAGE_ID:$VERSION
-            fi
-          fi
+      - name: Get conductor openapi spec
+        run: curl http://localhost:8080/v3/api-docs -o openapi.json
+
+      - name: Check out swagger_docs branch
+        uses: actions/checkout@v4
+        with:
+          ref: swagger_docs
+          path: swagger_docs
+          fetch-depth: 2
+          token: ${{ secrets.GH_PAT_TOKEN }}
+
+      - name: Copy files to swagger_docs
+        run: |
+          GIT_HASH=$(git rev-parse --short $GITHUB_SHA)
+          jq . openapi.json > swagger_docs/${IMAGE_TAG}.json
+          pushd swagger_docs || exit 1
+            git config -l --show-scope
+            git config --global user.email "support@frinx.io"
+            git config --global user.name "FRINXrepo"
+            git add *.json
+            (git commit -am "Updated swagger for ${GITHUB_REF_NAME}/${GIT_HASH}" && git push) || true
+          popd
