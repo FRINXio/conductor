@@ -726,6 +726,21 @@ public class RedisExecutionDAO extends BaseDynoDAO
         }
     }
 
+    @Override
+    public List<String> getLabels(String wfId) {
+        return null;
+    }
+
+    @Override
+    public List<String> getTaskDescription(String taskType) {
+        return null;
+    }
+
+    @Override
+    public List<String> getUserIds(List<String> groupsAndRoles, List<String> wfIds) {
+        return null;
+    }
+
     public List<EventExecution> getEventExecutions(
             String eventHandlerName, String eventName, String messageId, int max) {
         try {

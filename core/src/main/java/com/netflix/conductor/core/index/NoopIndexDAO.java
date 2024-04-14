@@ -160,4 +160,9 @@ public class NoopIndexDAO implements IndexDAO {
     public long getWorkflowCount(String query, String freeText) {
         return 0;
     }
+
+    @Override
+    public SearchResult<WorkflowSummary> getUserSummaries(List<String> groupsAndRoles) {
+        return null;
+    }
 }

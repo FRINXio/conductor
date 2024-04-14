@@ -164,4 +164,9 @@ public class WorkflowBulkServiceImpl implements WorkflowBulkService {
         }
         return bulkResponse;
     }
+
+    @Override
+    public List<String> getUserIds(List<String> groupsAndRoles, List<String> wfIds) {
+        return workflowExecutor.getUserIds(groupsAndRoles, wfIds);
+    }
 }

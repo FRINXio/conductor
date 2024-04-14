@@ -15,6 +15,7 @@ package com.netflix.conductor.rest.controllers;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,11 +27,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 
 import com.netflix.conductor.common.metadata.workflow.RerunWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.SkipTaskRequest;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.run.*;
+import com.netflix.conductor.rest.rbac.HeaderValidatorFilter;
+import com.netflix.conductor.rest.rbac.RbacUtils;
 import com.netflix.conductor.service.WorkflowService;
 import com.netflix.conductor.service.WorkflowTestService;
 
@@ -55,12 +59,22 @@ public class WorkflowResource {
         this.workflowTestService = workflowTestService;
     }
 
+    @Autowired HeaderValidatorFilter filter;
+
     @PostMapping(produces = TEXT_PLAIN_VALUE)
     @Operation(
             summary =
                     "Start a new workflow with StartWorkflowRequest, which allows task to be executed in a domain")
     public String startWorkflow(@RequestBody StartWorkflowRequest request) {
-        return workflowService.startWorkflow(request);
+
+        if (filter.getUser().isAdmin()) {
+            return workflowService.startWorkflow(request);
+        } else if (RbacUtils.isUserInGroup(
+                filter.getUser().getGroupsAndRoles(),
+                workflowService.getWorkflowDescription(request.getName(), request.getVersion()))) {
+            return workflowService.startWorkflow(request);
+        }
+        throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping(value = "/{name}", produces = TEXT_PLAIN_VALUE)
@@ -106,7 +120,14 @@ public class WorkflowResource {
             @PathVariable("workflowId") String workflowId,
             @RequestParam(value = "includeTasks", defaultValue = "true", required = false)
                     boolean includeTasks) {
-        return workflowService.getExecutionStatus(workflowId, includeTasks);
+
+        if (filter.getUser().isAdmin()) {
+            return workflowService.getExecutionStatus(workflowId, includeTasks);
+        } else if (RbacUtils.isUserInGroup(
+                filter.getUser().getGroupsAndRoles(), workflowService.getLabels(workflowId))) {
+            return workflowService.getExecutionStatus(workflowId, includeTasks);
+        }
+        throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/family/{workflowId}")
@@ -115,7 +136,14 @@ public class WorkflowResource {
             @PathVariable("workflowId") String workflowId,
             @RequestParam(value = "summaryOnly", defaultValue = "true", required = false)
                     boolean summaryOnly) {
-        return workflowService.getWorkflowFamily(workflowId, summaryOnly);
+
+        if (filter.getUser().isAdmin()) {
+            return workflowService.getWorkflowFamily(workflowId, summaryOnly);
+        } else if (RbacUtils.isUserInGroup(
+                filter.getUser().getGroupsAndRoles(), workflowService.getLabels(workflowId))) {
+            return workflowService.getWorkflowFamily(workflowId, summaryOnly);
+        }
+        throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/path/{workflowId}")
@@ -234,7 +262,12 @@ public class WorkflowResource {
             @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "freeText", defaultValue = "*", required = false) String freeText,
             @RequestParam(value = "query", required = false) String query) {
-        return workflowService.searchWorkflows(start, size, sort, freeText, query);
+
+        if (filter.getUser().isAdmin()) {
+            return workflowService.searchWorkflows(start, size, sort, freeText, query);
+        } else {
+            return workflowService.getUserSummaries(filter.getUser().getGroupsAndRoles());
+        }
     }
 
     @Operation(

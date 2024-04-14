@@ -20,6 +20,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import com.netflix.conductor.common.metadata.events.EventHandler;
+import com.netflix.conductor.rest.rbac.HeaderValidatorFilter;
+import com.netflix.conductor.rest.rbac.RbacProperties;
+import com.netflix.conductor.rest.rbac.UserType;
 import com.netflix.conductor.service.EventService;
 
 import static org.junit.Assert.assertEquals;
@@ -37,10 +40,15 @@ public class EventResourceTest {
 
     @Mock private EventService mockEventService;
 
+    @Mock RbacProperties properties;
+
     @Before
     public void setUp() {
         this.mockEventService = mock(EventService.class);
         this.eventResource = new EventResource(this.mockEventService);
+        this.properties = mock(RbacProperties.class);
+        this.eventResource.filter = new HeaderValidatorFilter(properties);
+        this.eventResource.filter.setUser(new UserType(new ArrayList<>(List.of("admin")), true));
     }
 
     @Test

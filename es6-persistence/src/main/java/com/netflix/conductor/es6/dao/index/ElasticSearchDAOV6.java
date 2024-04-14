@@ -681,6 +681,11 @@ public class ElasticSearchDAOV6 extends ElasticSearchBaseDAO implements IndexDAO
     }
 
     @Override
+    public SearchResult<WorkflowSummary> getUserSummaries(List<String> groupsAndRoles) {
+        return null;
+    }
+
+    @Override
     public SearchResult<String> searchTasks(
             String query, String freeText, int start, int count, List<String> sort) {
         return search(query, start, count, sort, freeText, TASK_DOC_TYPE, true, String.class);

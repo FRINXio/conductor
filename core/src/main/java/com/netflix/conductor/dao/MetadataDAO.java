@@ -15,6 +15,7 @@ package com.netflix.conductor.dao;
 import java.util.List;
 import java.util.Optional;
 
+import com.netflix.conductor.common.metadata.BaseDef;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 
@@ -86,4 +87,10 @@ public interface MetadataDAO {
      * @return List the latest versions of the workflow definitions
      */
     List<WorkflowDef> getAllWorkflowDefsLatestVersions();
+
+    List<String> getDescription(BaseDef def);
+
+    List<WorkflowDef> getUserWorkflowDefs(List<String> groupsAndRoles);
+
+    List<TaskDef> getUserTaskDefs(List<String> groupsAndRoles);
 }

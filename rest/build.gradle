@@ -1,5 +1,6 @@
 dependencies {
 
+    implementation project(':conductor-client')
     implementation project(':conductor-common')
     implementation project(':conductor-core')
 

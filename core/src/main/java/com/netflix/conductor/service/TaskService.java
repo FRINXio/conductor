@@ -250,4 +250,6 @@ public interface TaskService {
      */
     ExternalStorageLocation getExternalStorageLocation(
             String path, String operation, String payloadType);
+
+    List<String> getTaskDefinition(String taskType);
 }

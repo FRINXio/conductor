@@ -60,9 +60,14 @@ public class ClientRequestHandler {
         if (body != null) {
             return client.resource(uri)
                     .type(MediaType.APPLICATION_JSON_TYPE)
+                    .header("from", "admin")
+                    .header("x-auth-user-roles", "admin")
                     .delete(BulkResponse.class, body);
         } else {
-            client.resource(uri).delete();
+            client.resource(uri)
+                    .header("from", "admin")
+                    .header("x-auth-user-roles", "admin")
+                    .delete();
         }
         return null;
     }
@@ -70,6 +75,8 @@ public class ClientRequestHandler {
     public ClientResponse get(URI uri) {
         return client.resource(uri)
                 .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
+                .header("from", "admin")
+                .header("x-auth-user-roles", "admin")
                 .get(ClientResponse.class);
     }
 
@@ -77,7 +84,9 @@ public class ClientRequestHandler {
         return client.resource(URI)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(entity)
-                .accept(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON);
+                .accept(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON)
+                .header("From", "admin")
+                .header("x-auth-user-roles", "admin");
     }
 
     private boolean isNewerJacksonVersion() {

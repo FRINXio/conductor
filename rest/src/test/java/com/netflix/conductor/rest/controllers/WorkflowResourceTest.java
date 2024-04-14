@@ -25,6 +25,9 @@ import com.netflix.conductor.common.metadata.workflow.RerunWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.SkipTaskRequest;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.run.Workflow;
+import com.netflix.conductor.rest.rbac.HeaderValidatorFilter;
+import com.netflix.conductor.rest.rbac.RbacProperties;
+import com.netflix.conductor.rest.rbac.UserType;
 import com.netflix.conductor.service.WorkflowService;
 import com.netflix.conductor.service.WorkflowTestService;
 
@@ -49,12 +52,17 @@ public class WorkflowResourceTest {
 
     private WorkflowResource workflowResource;
 
+    @Mock RbacProperties properties;
+
     @Before
     public void before() {
         this.mockWorkflowService = mock(WorkflowService.class);
         this.mockWorkflowTestService = mock(WorkflowTestService.class);
         this.workflowResource =
                 new WorkflowResource(this.mockWorkflowService, this.mockWorkflowTestService);
+        this.properties = mock(RbacProperties.class);
+        this.workflowResource.filter = new HeaderValidatorFilter(properties);
+        this.workflowResource.filter.setUser(new UserType(new ArrayList<>(List.of("admin")), true));
     }
 
     @Test

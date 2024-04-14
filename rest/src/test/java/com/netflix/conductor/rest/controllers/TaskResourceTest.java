@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 
 import com.netflix.conductor.common.metadata.tasks.PollData;
@@ -29,6 +30,9 @@ import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.common.run.ExternalStorageLocation;
 import com.netflix.conductor.common.run.SearchResult;
 import com.netflix.conductor.common.run.TaskSummary;
+import com.netflix.conductor.rest.rbac.HeaderValidatorFilter;
+import com.netflix.conductor.rest.rbac.RbacProperties;
+import com.netflix.conductor.rest.rbac.UserType;
 import com.netflix.conductor.service.TaskService;
 
 import static org.junit.Assert.assertEquals;
@@ -48,10 +52,15 @@ public class TaskResourceTest {
 
     private TaskResource taskResource;
 
+    @Mock RbacProperties properties;
+
     @Before
     public void before() {
         this.mockTaskService = mock(TaskService.class);
         this.taskResource = new TaskResource(this.mockTaskService);
+        this.properties = mock(RbacProperties.class);
+        this.taskResource.filter = new HeaderValidatorFilter(properties);
+        this.taskResource.filter.setUser(new UserType(new ArrayList<>(List.of("admin")), true));
     }
 
     @Test

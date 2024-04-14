@@ -611,4 +611,16 @@ public class ExecutionService {
     public List<String> getWorkflowPath(String workflowId) {
         return executionDAOFacade.getWorkflowPath(workflowId);
     }
+
+    public List<String> getLabels(String wfId) {
+        return executionDAOFacade.getLabels(wfId);
+    }
+
+    public List<String> getTaskDescription(String taskType) {
+        return executionDAOFacade.getTaskDescription(taskType);
+    }
+
+    public SearchResult<WorkflowSummary> getUserSummaries(List<String> groupsAndRoles) {
+        return executionDAOFacade.getUserSummaries(groupsAndRoles);
+    }
 }

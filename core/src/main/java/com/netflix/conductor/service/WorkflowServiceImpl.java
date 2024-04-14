@@ -195,6 +195,21 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflows;
     }
 
+    @Override
+    public List<String> getWorkflowDescription(String id, Integer version) {
+        return metadataService.getWorkflowDescription(id, version);
+    }
+
+    @Override
+    public List<String> getLabels(String wfId) {
+        return executionService.getLabels(wfId);
+    }
+
+    @Override
+    public SearchResult<WorkflowSummary> getUserSummaries(List<String> groupsAndRoles) {
+        return executionService.getUserSummaries(groupsAndRoles);
+    }
+
     /**
      * Removes the workflow from the system.
      *

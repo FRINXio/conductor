@@ -366,4 +366,9 @@ public class TaskServiceImpl implements TaskService {
             String path, String operation, String type) {
         return executionService.getExternalStorageLocation(path, operation, type);
     }
+
+    @Override
+    public List<String> getTaskDefinition(String taskType) {
+        return executionService.getTaskDescription(taskType);
+    }
 }

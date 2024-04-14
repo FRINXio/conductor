@@ -223,6 +223,26 @@ public class MetadataServiceImpl implements MetadataService {
         return metadataDAO.getAllWorkflowDefsLatestVersions();
     }
 
+    @Override
+    public List<String> getWorkflowDescription(String name, Integer version) {
+        return metadataDAO.getDescription(getWorkflowDef(name, version));
+    }
+
+    @Override
+    public List<String> getTaskDescription(String name) {
+        return metadataDAO.getDescription(getTaskDef(name));
+    }
+
+    @Override
+    public List<WorkflowDef> getUserWorkflowDefs(List<String> groupsAndRoles) {
+        return metadataDAO.getUserWorkflowDefs(groupsAndRoles);
+    }
+
+    @Override
+    public List<TaskDef> getUserTaskDefs(List<String> groupsAndRoles) {
+        return metadataDAO.getUserTaskDefs(groupsAndRoles);
+    }
+
     public Map<String, ? extends Iterable<WorkflowDefSummary>> getWorkflowNamesAndVersions() {
         List<WorkflowDef> workflowDefs = metadataDAO.getAllWorkflowDefs();
 

@@ -759,6 +759,22 @@ public class ExecutionDAOFacade {
         }
     }
 
+    public List<String> getLabels(String wfId) {
+        return executionDAO.getLabels(wfId);
+    }
+
+    public List<String> getTaskDescription(String taskType) {
+        return executionDAO.getTaskDescription(taskType);
+    }
+
+    public SearchResult<WorkflowSummary> getUserSummaries(List<String> groupsAndRoles) {
+        return indexDAO.getUserSummaries(groupsAndRoles);
+    }
+
+    public List<String> getUserIds(List<String> groupsAndRoles, List<String> wfIds) {
+        return executionDAO.getUserIds(groupsAndRoles, wfIds);
+    }
+
     class DelayWorkflowUpdate implements Runnable {
 
         private final String workflowId;

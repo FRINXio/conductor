@@ -14,6 +14,8 @@ package com.netflix.conductor.rest.controllers;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +25,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 
 import com.netflix.conductor.common.metadata.events.EventHandler;
+import com.netflix.conductor.rest.rbac.HeaderValidatorFilter;
 import com.netflix.conductor.service.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,16 +45,28 @@ public class EventResource {
         this.eventService = eventService;
     }
 
+    @Autowired HeaderValidatorFilter filter;
+
     @PostMapping
     @Operation(summary = "Add a new event handler.")
     public void addEventHandler(@RequestBody EventHandler eventHandler) {
-        eventService.addEventHandler(eventHandler);
+
+        if (filter.getUser().isAdmin()) {
+            eventService.addEventHandler(eventHandler);
+        } else {
+            throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PutMapping
     @Operation(summary = "Update an existing event handler.")
     public void updateEventHandler(@RequestBody EventHandler eventHandler) {
-        eventService.updateEventHandler(eventHandler);
+
+        if (filter.getUser().isAdmin()) {
+            eventService.updateEventHandler(eventHandler);
+        } else {
+            throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @DeleteMapping("/{name}")
@@ -62,7 +78,11 @@ public class EventResource {
     @GetMapping
     @Operation(summary = "Get all the event handlers")
     public List<EventHandler> getEventHandlers() {
-        return eventService.getEventHandlers();
+
+        if (filter.getUser().isAdmin()) {
+            return eventService.getEventHandlers();
+        }
+        throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/{event}")

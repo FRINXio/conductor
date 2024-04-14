@@ -17,9 +17,13 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
+import com.netflix.conductor.rest.rbac.HeaderValidatorFilter;
+import com.netflix.conductor.rest.rbac.RbacProperties;
+import com.netflix.conductor.rest.rbac.UserType;
 import com.netflix.conductor.service.MetadataService;
 
 import static org.junit.Assert.assertEquals;
@@ -37,10 +41,15 @@ public class MetadataResourceTest {
 
     private MetadataService mockMetadataService;
 
+    @Mock RbacProperties properties;
+
     @Before
     public void before() {
         this.mockMetadataService = mock(MetadataService.class);
         this.metadataResource = new MetadataResource(this.mockMetadataService);
+        this.properties = mock(RbacProperties.class);
+        this.metadataResource.filter = new HeaderValidatorFilter(properties);
+        this.metadataResource.filter.setUser(new UserType(new ArrayList<>(List.of("admin")), true));
     }
 
     @Test

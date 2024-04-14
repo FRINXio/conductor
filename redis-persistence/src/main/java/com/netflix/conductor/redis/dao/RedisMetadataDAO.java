@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
+import com.netflix.conductor.common.metadata.BaseDef;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.core.config.ConductorProperties;
@@ -318,6 +319,21 @@ public class RedisMetadataDAO extends BaseDynoDAO implements MetadataDAO {
         }
         recordRedisDaoPayloadSize("getAllWorkflowLatestVersionsDefs", size, "n/a", "n/a");
         return workflows;
+    }
+
+    @Override
+    public List<String> getDescription(BaseDef def) {
+        return null;
+    }
+
+    @Override
+    public List<WorkflowDef> getUserWorkflowDefs(List<String> groupsAndRoles) {
+        return null;
+    }
+
+    @Override
+    public List<TaskDef> getUserTaskDefs(List<String> groupsAndRoles) {
+        return null;
     }
 
     private void _createOrUpdate(WorkflowDef workflowDef) {

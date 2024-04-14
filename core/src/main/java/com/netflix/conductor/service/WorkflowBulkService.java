@@ -67,4 +67,6 @@ public interface WorkflowBulkService {
                                     "Cannot process more than {max} workflows. Please use multiple requests.")
                     List<String> workflowIds,
             String reason);
+
+    List<String> getUserIds(List<String> groupsAndRoles, List<String> wfIds);
 }

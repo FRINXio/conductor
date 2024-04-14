@@ -1117,6 +1117,11 @@ public class ElasticSearchRestDAOV6 extends ElasticSearchBaseDAO implements Inde
         }
     }
 
+    @Override
+    public SearchResult<WorkflowSummary> getUserSummaries(List<String> groupsAndRoles) {
+        return null;
+    }
+
     private long getObjectCounts(String structuredQuery, String freeTextQuery, String docType)
             throws ParserException, IOException {
         QueryBuilder queryBuilder = boolQueryBuilder(structuredQuery, freeTextQuery);

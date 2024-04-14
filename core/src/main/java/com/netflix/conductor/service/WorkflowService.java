@@ -401,4 +401,10 @@ public interface WorkflowService {
     List<String> getWorkflowPath(String workflowId);
 
     List<Workflow> getWorkflowFamily(String workflowId, boolean summaryOnly);
+
+    List<String> getWorkflowDescription(String id, Integer version);
+
+    List<String> getLabels(String wfId);
+
+    SearchResult<WorkflowSummary> getUserSummaries(List<String> groupsAndRoles);
 }

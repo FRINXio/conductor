@@ -222,4 +222,10 @@ public interface ExecutionDAO {
     default List<WorkflowModel> getWorkflowFamily(String workflowId, boolean summaryOnly) {
         throw new UnsupportedOperationException();
     }
+
+    List<String> getLabels(String wfId);
+
+    List<String> getTaskDescription(String taskType);
+
+    List<String> getUserIds(List<String> groupsAndRoles, List<String> wfIds);
 }

@@ -156,4 +156,12 @@ public interface MetadataService {
             boolean activeOnly);
 
     List<WorkflowDef> getWorkflowDefsLatestVersions();
+
+    List<String> getWorkflowDescription(String id, Integer version);
+
+    List<String> getTaskDescription(String id);
+
+    List<WorkflowDef> getUserWorkflowDefs(List<String> groupsAndRoles);
+
+    List<TaskDef> getUserTaskDefs(List<String> groupsAndRoles);
 }

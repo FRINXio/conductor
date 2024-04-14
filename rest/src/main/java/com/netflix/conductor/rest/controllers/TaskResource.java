@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 
 import com.netflix.conductor.common.metadata.tasks.PollData;
 import com.netflix.conductor.common.metadata.tasks.Task;
@@ -32,6 +35,7 @@ import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.common.run.ExternalStorageLocation;
 import com.netflix.conductor.common.run.SearchResult;
 import com.netflix.conductor.common.run.TaskSummary;
+import com.netflix.conductor.rest.rbac.HeaderValidatorFilter;
 import com.netflix.conductor.service.TaskService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +54,8 @@ public class TaskResource {
         this.taskService = taskService;
     }
 
+    @Autowired HeaderValidatorFilter filter;
+
     @GetMapping("/poll/{tasktype}")
     @Operation(summary = "Poll for a task of a certain type")
     public ResponseEntity<Task> poll(
@@ -57,9 +63,13 @@ public class TaskResource {
             @RequestParam(value = "workerid", required = false) String workerId,
             @RequestParam(value = "domain", required = false) String domain) {
         // for backwards compatibility with 2.x client which expects a 204 when no Task is found
-        return Optional.ofNullable(taskService.poll(taskType, workerId, domain))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+
+        if (filter.getUser().isAdmin()) {
+            return Optional.ofNullable(taskService.poll(taskType, workerId, domain))
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.noContent().build());
+        }
+        throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/poll/batch/{tasktype}")
@@ -71,10 +81,14 @@ public class TaskResource {
             @RequestParam(value = "count", defaultValue = "1") int count,
             @RequestParam(value = "timeout", defaultValue = "100") int timeout) {
         // for backwards compatibility with 2.x client which expects a 204 when no Task is found
-        return Optional.ofNullable(
-                        taskService.batchPoll(taskType, workerId, domain, count, timeout))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+
+        if (filter.getUser().isAdmin()) {
+            return Optional.ofNullable(
+                            taskService.batchPoll(taskType, workerId, domain, count, timeout))
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.noContent().build());
+        }
+        throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping(produces = TEXT_PLAIN_VALUE)
@@ -132,7 +146,11 @@ public class TaskResource {
     @GetMapping("/queue/all")
     @Operation(summary = "Get the details about each queue")
     public Map<String, Long> all() {
-        return taskService.getAllQueueDetails();
+
+        if (filter.getUser().isAdmin()) {
+            return taskService.getAllQueueDetails();
+        }
+        throw new HttpServerErrorException(HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/queue/polldata")

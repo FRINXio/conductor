@@ -1790,4 +1790,8 @@ public class WorkflowExecutor {
 
         LOGGER.info("Pushed workflow {} to {} for expedited evaluation", workflowId, DECIDER_QUEUE);
     }
+
+    public List<String> getUserIds(List<String> groupsAndRoles, List<String> wfIds) {
+        return executionDAOFacade.getUserIds(groupsAndRoles, wfIds);
+    }
 }
