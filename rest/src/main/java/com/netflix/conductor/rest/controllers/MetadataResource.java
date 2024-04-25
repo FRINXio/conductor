@@ -29,6 +29,8 @@ import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDefSummary;
 import com.netflix.conductor.common.model.BulkResponse;
+import com.netflix.conductor.rest.rbac.annotations.RbacAdminAccess;
+import com.netflix.conductor.rest.rbac.annotations.RbacPathVarObject;
 import com.netflix.conductor.service.MetadataService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,24 +47,28 @@ public class MetadataResource {
         this.metadataService = metadataService;
     }
 
+    @RbacAdminAccess
     @PostMapping("/workflow")
     @Operation(summary = "Create a new workflow definition")
     public void create(@RequestBody WorkflowDef workflowDef) {
         metadataService.registerWorkflowDef(workflowDef);
     }
 
+    @RbacAdminAccess
     @PostMapping("/workflow/validate")
     @Operation(summary = "Validates a new workflow definition")
     public void validate(@RequestBody WorkflowDef workflowDef) {
         metadataService.validateWorkflowDef(workflowDef);
     }
 
+    @RbacAdminAccess
     @PutMapping("/workflow")
     @Operation(summary = "Create or update workflow definition")
     public BulkResponse update(@RequestBody List<WorkflowDef> workflowDefs) {
         return metadataService.updateWorkflowDef(workflowDefs);
     }
 
+    @RbacPathVarObject
     @Operation(summary = "Retrieves workflow definition along with blueprint")
     @GetMapping("/workflow/{name}")
     public WorkflowDef get(
@@ -71,6 +77,7 @@ public class MetadataResource {
         return metadataService.getWorkflowDef(name, version);
     }
 
+    @RbacPathVarObject
     @Operation(summary = "Retrieves all workflow definition along with blueprint")
     @GetMapping("/workflow")
     public List<WorkflowDef> getAll() {
@@ -83,12 +90,14 @@ public class MetadataResource {
         return metadataService.getWorkflowNamesAndVersions();
     }
 
+    @RbacAdminAccess
     @Operation(summary = "Returns only the latest version of all workflow definitions")
     @GetMapping("/workflow/latest-versions")
     public List<WorkflowDef> getAllWorkflowsWithLatestVersions() {
         return metadataService.getWorkflowDefsLatestVersions();
     }
 
+    @RbacAdminAccess
     @DeleteMapping("/workflow/{name}/{version}")
     @Operation(
             summary =
@@ -98,30 +107,36 @@ public class MetadataResource {
         metadataService.unregisterWorkflowDef(name, version);
     }
 
+    @RbacAdminAccess
     @PostMapping("/taskdefs")
     @Operation(summary = "Create new task definition(s)")
     public void registerTaskDef(@RequestBody List<TaskDef> taskDefs) {
         metadataService.registerTaskDef(taskDefs);
     }
 
+    @RbacAdminAccess
     @PutMapping("/taskdefs")
     @Operation(summary = "Update an existing task")
     public void registerTaskDef(@RequestBody TaskDef taskDef) {
         metadataService.updateTaskDef(taskDef);
     }
 
+    @RbacPathVarObject
     @GetMapping(value = "/taskdefs")
     @Operation(summary = "Gets all task definition")
     public List<TaskDef> getTaskDefs() {
         return metadataService.getTaskDefs();
     }
 
+    @RbacPathVarObject
+    @RbacAdminAccess
     @GetMapping("/taskdefs/{tasktype}")
     @Operation(summary = "Gets the task definition")
     public TaskDef getTaskDef(@PathVariable("tasktype") String taskType) {
         return metadataService.getTaskDef(taskType);
     }
 
+    @RbacAdminAccess
     @DeleteMapping("/taskdefs/{tasktype}")
     @Operation(summary = "Remove a task definition")
     public void unregisterTaskDef(@PathVariable("tasktype") String taskType) {

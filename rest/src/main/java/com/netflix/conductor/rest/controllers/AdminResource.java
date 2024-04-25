@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.netflix.conductor.common.metadata.tasks.Task;
+import com.netflix.conductor.rest.rbac.annotations.RbacAdminAccess;
 import com.netflix.conductor.service.AdminService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,12 +42,14 @@ public class AdminResource {
         this.adminService = adminService;
     }
 
+    @RbacAdminAccess
     @Operation(summary = "Get all the configuration parameters")
     @GetMapping("/config")
     public Map<String, Object> getAllConfig() {
         return adminService.getAllConfig();
     }
 
+    @RbacAdminAccess
     @GetMapping("/task/{tasktype}")
     @Operation(summary = "Get the list of pending tasks for a given task type")
     public List<Task> view(
@@ -56,12 +59,14 @@ public class AdminResource {
         return adminService.getListOfPendingTask(taskType, start, count);
     }
 
+    @RbacAdminAccess
     @PostMapping(value = "/sweep/requeue/{workflowId}", produces = TEXT_PLAIN_VALUE)
     @Operation(summary = "Queue up all the running workflows for sweep")
     public String requeueSweep(@PathVariable("workflowId") String workflowId) {
         return adminService.requeueSweep(workflowId);
     }
 
+    @RbacAdminAccess
     @PostMapping(value = "/consistency/verifyAndRepair/{workflowId}", produces = TEXT_PLAIN_VALUE)
     @Operation(summary = "Verify and repair workflow consistency")
     public String verifyAndRepairWorkflowConsistency(
@@ -69,6 +74,7 @@ public class AdminResource {
         return String.valueOf(adminService.verifyAndRepairWorkflowConsistency(workflowId));
     }
 
+    @RbacAdminAccess
     @GetMapping("/queues")
     @Operation(summary = "Get registered queues")
     public Map<String, ?> getEventQueues(

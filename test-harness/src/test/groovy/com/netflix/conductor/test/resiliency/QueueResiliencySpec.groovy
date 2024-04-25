@@ -27,6 +27,8 @@ import com.netflix.conductor.core.utils.QueueUtils
 import com.netflix.conductor.core.utils.Utils
 import com.netflix.conductor.rest.controllers.TaskResource
 import com.netflix.conductor.rest.controllers.WorkflowResource
+import com.netflix.conductor.rest.rbac.RbacHttpFilter
+import com.netflix.conductor.rest.rbac.UserType
 import com.netflix.conductor.test.base.AbstractResiliencySpecification
 
 /**
@@ -44,6 +46,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
     @Autowired
     TaskResource taskResource
 
+    @Autowired
+    RbacHttpFilter filter;
+
     def SIMPLE_TWO_TASK_WORKFLOW = 'integration_test_wf'
 
     def setup() {
@@ -51,6 +56,7 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         workflowTestUtil.registerWorkflows(
                 'simple_workflow_1_integration_test.json'
         )
+        filter.setUser(new UserType(List.of("admin"), true))
     }
 
     /// Workflow Resource endpoints

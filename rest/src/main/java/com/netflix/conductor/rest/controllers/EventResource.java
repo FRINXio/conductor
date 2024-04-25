@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.netflix.conductor.common.metadata.events.EventHandler;
+import com.netflix.conductor.rest.rbac.annotations.RbacAdminAccess;
 import com.netflix.conductor.service.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,30 +42,35 @@ public class EventResource {
         this.eventService = eventService;
     }
 
+    @RbacAdminAccess
     @PostMapping
     @Operation(summary = "Add a new event handler.")
     public void addEventHandler(@RequestBody EventHandler eventHandler) {
         eventService.addEventHandler(eventHandler);
     }
 
+    @RbacAdminAccess
     @PutMapping
     @Operation(summary = "Update an existing event handler.")
     public void updateEventHandler(@RequestBody EventHandler eventHandler) {
         eventService.updateEventHandler(eventHandler);
     }
 
+    @RbacAdminAccess
     @DeleteMapping("/{name}")
     @Operation(summary = "Remove an event handler")
     public void removeEventHandlerStatus(@PathVariable("name") String name) {
         eventService.removeEventHandlerStatus(name);
     }
 
+    @RbacAdminAccess
     @GetMapping
     @Operation(summary = "Get all the event handlers")
     public List<EventHandler> getEventHandlers() {
         return eventService.getEventHandlers();
     }
 
+    @RbacAdminAccess
     @GetMapping("/{event}")
     @Operation(summary = "Get event handlers for a given event")
     public List<EventHandler> getEventHandlersForEvent(

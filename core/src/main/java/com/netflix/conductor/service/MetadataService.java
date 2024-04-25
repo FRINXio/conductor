@@ -23,6 +23,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.netflix.conductor.common.metadata.BaseDef;
 import com.netflix.conductor.common.metadata.events.EventHandler;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
@@ -156,4 +157,12 @@ public interface MetadataService {
             boolean activeOnly);
 
     List<WorkflowDef> getWorkflowDefsLatestVersions();
+
+    boolean hasAccess(Object[] args, List<String> labels, String uri);
+
+    boolean exists(Object[] args, String uri);
+
+    List<? extends BaseDef> getUserTaskDefs(List<String> roles);
+
+    List<? extends BaseDef> getUserWorkflowDefs(List<String> roles);
 }

@@ -1117,6 +1117,12 @@ public class ElasticSearchRestDAOV6 extends ElasticSearchBaseDAO implements Inde
         }
     }
 
+    @Override
+    public SearchResult<WorkflowSummary> getSummaries(SearchResult<String> searchResultIds) {
+        throw new UnsupportedOperationException(
+                "getSummaries is not supported in ElasticSearchRestDAOV6");
+    }
+
     private long getObjectCounts(String structuredQuery, String freeTextQuery, String docType)
             throws ParserException, IOException {
         QueryBuilder queryBuilder = boolQueryBuilder(structuredQuery, freeTextQuery);

@@ -401,4 +401,18 @@ public interface WorkflowService {
     List<String> getWorkflowPath(String workflowId);
 
     List<Workflow> getWorkflowFamily(String workflowId, boolean summaryOnly);
+
+    boolean hasAccess(Object[] args, List<String> labels);
+
+    boolean exists(Object[] args);
+
+    List<String> getUserWorkflowIds(List<String> labels);
+
+    List<String> getPresentIds(List<String> ids);
+
+    SearchResult<String> getSearchResultIds(List<String> roles);
+
+    SearchResult<WorkflowSummary> getSummaries(SearchResult<String> searchResultIds);
+
+    SearchResult<Workflow> getUserWorkflows(SearchResult<String> searchResultIds);
 }

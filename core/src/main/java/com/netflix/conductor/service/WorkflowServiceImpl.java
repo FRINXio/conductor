@@ -195,6 +195,41 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflows;
     }
 
+    @Override
+    public boolean hasAccess(Object[] args, List<String> labels) {
+        return executionService.hasAccess(args, labels);
+    }
+
+    @Override
+    public boolean exists(Object[] args) {
+        return executionService.exists(args);
+    }
+
+    @Override
+    public List<String> getUserWorkflowIds(List<String> labels) {
+        return executionService.getUserWorkflowIds(labels);
+    }
+
+    @Override
+    public List<String> getPresentIds(List<String> ids) {
+        return executionService.getPresentIds(ids);
+    }
+
+    @Override
+    public SearchResult<String> getSearchResultIds(List<String> roles) {
+        return executionService.getSearchResultIds(roles);
+    }
+
+    @Override
+    public SearchResult<WorkflowSummary> getSummaries(SearchResult<String> searchResultIds) {
+        return executionService.getSummaries(searchResultIds);
+    }
+
+    @Override
+    public SearchResult<Workflow> getUserWorkflows(SearchResult<String> searchResultIds) {
+        return executionService.getUserWorkflows(searchResultIds);
+    }
+
     /**
      * Removes the workflow from the system.
      *
