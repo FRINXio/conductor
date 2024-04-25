@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.netflix.conductor.core.events.queue.DefaultEventQueueProcessor;
 import com.netflix.conductor.model.TaskModel.Status;
+import com.netflix.conductor.rest.rbac.annotations.RbacAdminAccess;
 
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -38,18 +39,21 @@ public class QueueAdminResource {
         this.defaultEventQueueProcessor = defaultEventQueueProcessor;
     }
 
+    @RbacAdminAccess
     @Operation(summary = "Get the queue length")
     @GetMapping(value = "/size")
     public Map<String, Long> size() {
         return defaultEventQueueProcessor.size();
     }
 
+    @RbacAdminAccess
     @Operation(summary = "Get Queue Names")
     @GetMapping(value = "/")
     public Map<Status, String> names() {
         return defaultEventQueueProcessor.queues();
     }
 
+    @RbacAdminAccess
     @Operation(summary = "Publish a message in queue to mark a wait task as completed.")
     @PostMapping(value = "/update/{workflowId}/{taskRefName}/{status}")
     public void update(
@@ -61,6 +65,7 @@ public class QueueAdminResource {
         defaultEventQueueProcessor.updateByTaskRefName(workflowId, taskRefName, output, status);
     }
 
+    @RbacAdminAccess
     @Operation(summary = "Publish a message in queue to mark a wait task (by taskId) as completed.")
     @PostMapping("/update/{workflowId}/task/{taskId}/{status}")
     public void updateByTaskId(

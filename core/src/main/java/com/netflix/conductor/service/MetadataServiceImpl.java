@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.netflix.conductor.common.constraints.OwnerEmailMandatoryConstraint;
+import com.netflix.conductor.common.metadata.BaseDef;
 import com.netflix.conductor.common.metadata.events.EventHandler;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
@@ -221,6 +222,26 @@ public class MetadataServiceImpl implements MetadataService {
     @Override
     public List<WorkflowDef> getWorkflowDefsLatestVersions() {
         return metadataDAO.getAllWorkflowDefsLatestVersions();
+    }
+
+    @Override
+    public boolean hasAccess(Object[] args, List<String> labels, String uri) {
+        return metadataDAO.hasAccess(args, labels, uri);
+    }
+
+    @Override
+    public boolean exists(Object[] args, String uri) {
+        return metadataDAO.exists(args, uri);
+    }
+
+    @Override
+    public List<? extends BaseDef> getUserTaskDefs(List<String> roles) {
+        return metadataDAO.getUserTaskDefs(roles);
+    }
+
+    @Override
+    public List<? extends BaseDef> getUserWorkflowDefs(List<String> roles) {
+        return metadataDAO.getUserWorkflowDefs(roles);
     }
 
     public Map<String, ? extends Iterable<WorkflowDefSummary>> getWorkflowNamesAndVersions() {

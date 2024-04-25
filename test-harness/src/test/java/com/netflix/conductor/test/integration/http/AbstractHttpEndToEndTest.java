@@ -18,8 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -47,6 +49,8 @@ import com.netflix.conductor.common.run.Workflow;
 import com.netflix.conductor.common.run.Workflow.WorkflowStatus;
 import com.netflix.conductor.common.run.WorkflowSummary;
 import com.netflix.conductor.common.validation.ValidationError;
+import com.netflix.conductor.rest.rbac.RbacHttpFilter;
+import com.netflix.conductor.rest.rbac.UserType;
 import com.netflix.conductor.test.integration.AbstractEndToEndTest;
 
 import static org.junit.Assert.assertEquals;
@@ -68,6 +72,14 @@ public abstract class AbstractHttpEndToEndTest extends AbstractEndToEndTest {
     protected static WorkflowClient workflowClient;
     protected static MetadataClient metadataClient;
     protected static EventClient eventClient;
+
+    @Autowired RbacHttpFilter filter;
+
+    @Before
+    public void before() {
+        filter.setTestingUser(true);
+        filter.setUser(new UserType(List.of("admin"), true));
+    }
 
     @Override
     protected String startWorkflow(String workflowExecutionName, WorkflowDef workflowDefinition) {

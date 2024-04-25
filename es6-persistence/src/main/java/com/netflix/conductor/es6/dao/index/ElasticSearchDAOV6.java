@@ -681,6 +681,12 @@ public class ElasticSearchDAOV6 extends ElasticSearchBaseDAO implements IndexDAO
     }
 
     @Override
+    public SearchResult<WorkflowSummary> getSummaries(SearchResult<String> searchResultIds) {
+        throw new UnsupportedOperationException(
+                "getSummaries is not supported in ElasticSearchDAOV6");
+    }
+
+    @Override
     public SearchResult<String> searchTasks(
             String query, String freeText, int start, int count, List<String> sort) {
         return search(query, start, count, sort, freeText, TASK_DOC_TYPE, true, String.class);

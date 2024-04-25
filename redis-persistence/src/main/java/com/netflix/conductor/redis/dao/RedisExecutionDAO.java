@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import com.netflix.conductor.common.metadata.events.EventExecution;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
+import com.netflix.conductor.common.run.SearchResult;
 import com.netflix.conductor.core.config.ConductorProperties;
 import com.netflix.conductor.core.exception.TransientException;
 import com.netflix.conductor.dao.ConcurrentExecutionLimitDAO;
@@ -724,6 +725,31 @@ public class RedisExecutionDAO extends BaseDynoDAO
             throw new TransientException(
                     "Unable to remove event execution for " + eventExecution.getId(), e);
         }
+    }
+
+    @Override
+    public boolean hasAccess(Object[] args, List<String> labels) {
+        return false;
+    }
+
+    @Override
+    public boolean exists(Object[] args) {
+        return false;
+    }
+
+    @Override
+    public List<String> getUserWorkflowIds(List<String> labels) {
+        return List.of();
+    }
+
+    @Override
+    public List<String> getPresentIds(List<String> ids) {
+        return List.of();
+    }
+
+    @Override
+    public SearchResult<String> getSearchResultIds(List<String> roles) {
+        return new SearchResult<>(0, Collections.emptyList());
     }
 
     public List<EventExecution> getEventExecutions(

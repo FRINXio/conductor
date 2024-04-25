@@ -31,6 +31,8 @@ import com.netflix.conductor.common.metadata.workflow.RerunWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.SkipTaskRequest;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.run.*;
+import com.netflix.conductor.rest.rbac.annotations.RbacAdminAccess;
+import com.netflix.conductor.rest.rbac.annotations.RbacPathVarObject;
 import com.netflix.conductor.service.WorkflowService;
 import com.netflix.conductor.service.WorkflowTestService;
 
@@ -55,6 +57,7 @@ public class WorkflowResource {
         this.workflowTestService = workflowTestService;
     }
 
+    @RbacPathVarObject
     @PostMapping(produces = TEXT_PLAIN_VALUE)
     @Operation(
             summary =
@@ -63,6 +66,7 @@ public class WorkflowResource {
         return workflowService.startWorkflow(request);
     }
 
+    @RbacAdminAccess
     @PostMapping(value = "/{name}", produces = TEXT_PLAIN_VALUE)
     @Operation(
             summary =
@@ -76,6 +80,7 @@ public class WorkflowResource {
         return workflowService.startWorkflow(name, version, correlationId, priority, input);
     }
 
+    @RbacAdminAccess
     @GetMapping("/{name}/correlated/{correlationId}")
     @Operation(summary = "Lists workflows for the given correlation id")
     public List<Workflow> getWorkflows(
@@ -88,6 +93,7 @@ public class WorkflowResource {
         return workflowService.getWorkflows(name, correlationId, includeClosed, includeTasks);
     }
 
+    @RbacAdminAccess
     @PostMapping(value = "/{name}/correlated")
     @Operation(summary = "Lists workflows for the given correlation id list")
     public Map<String, List<Workflow>> getWorkflows(
@@ -100,6 +106,7 @@ public class WorkflowResource {
         return workflowService.getWorkflows(name, includeClosed, includeTasks, correlationIds);
     }
 
+    @RbacPathVarObject
     @GetMapping("/{workflowId}")
     @Operation(summary = "Gets the workflow by workflow id")
     public Workflow getExecutionStatus(
@@ -109,6 +116,7 @@ public class WorkflowResource {
         return workflowService.getExecutionStatus(workflowId, includeTasks);
     }
 
+    @RbacPathVarObject
     @GetMapping("/family/{workflowId}")
     @Operation(summary = "Gets the workflow by workflow id")
     public List<Workflow> getWorkflowFamily(
@@ -124,6 +132,7 @@ public class WorkflowResource {
         return workflowService.getWorkflowPath(workflowId);
     }
 
+    @RbacAdminAccess
     @DeleteMapping("/{workflowId}/remove")
     @Operation(summary = "Removes the workflow from the system")
     public void delete(
@@ -143,24 +152,28 @@ public class WorkflowResource {
         return workflowService.getRunningWorkflows(workflowName, version, startTime, endTime);
     }
 
+    @RbacAdminAccess
     @PutMapping("/decide/{workflowId}")
     @Operation(summary = "Starts the decision task for a workflow")
     public void decide(@PathVariable("workflowId") String workflowId) {
         workflowService.decideWorkflow(workflowId);
     }
 
+    @RbacAdminAccess
     @PutMapping("/{workflowId}/pause")
     @Operation(summary = "Pauses the workflow")
     public void pauseWorkflow(@PathVariable("workflowId") String workflowId) {
         workflowService.pauseWorkflow(workflowId);
     }
 
+    @RbacAdminAccess
     @PutMapping("/{workflowId}/resume")
     @Operation(summary = "Resumes the workflow")
     public void resumeWorkflow(@PathVariable("workflowId") String workflowId) {
         workflowService.resumeWorkflow(workflowId);
     }
 
+    @RbacAdminAccess
     @PutMapping("/{workflowId}/skiptask/{taskReferenceName}")
     @Operation(summary = "Skips a given task from a current running workflow")
     public void skipTaskFromWorkflow(
@@ -170,6 +183,7 @@ public class WorkflowResource {
         workflowService.skipTaskFromWorkflow(workflowId, taskReferenceName, skipTaskRequest);
     }
 
+    @RbacAdminAccess
     @PostMapping(value = "/{workflowId}/rerun", produces = TEXT_PLAIN_VALUE)
     @Operation(summary = "Reruns the workflow from a specific task")
     public String rerun(
@@ -178,6 +192,7 @@ public class WorkflowResource {
         return workflowService.rerunWorkflow(workflowId, request);
     }
 
+    @RbacAdminAccess
     @PostMapping("/{workflowId}/restart")
     @Operation(summary = "Restarts a completed workflow")
     @ResponseStatus(
@@ -190,6 +205,7 @@ public class WorkflowResource {
         workflowService.restartWorkflow(workflowId, useLatestDefinitions);
     }
 
+    @RbacAdminAccess
     @PostMapping("/{workflowId}/retry")
     @Operation(summary = "Retries the last failed task")
     @ResponseStatus(
@@ -205,6 +221,7 @@ public class WorkflowResource {
         workflowService.retryWorkflow(workflowId, resumeSubworkflowTasks);
     }
 
+    @RbacAdminAccess
     @PostMapping("/{workflowId}/resetcallbacks")
     @Operation(summary = "Resets callback times of all non-terminal SIMPLE tasks to 0")
     @ResponseStatus(
@@ -214,6 +231,7 @@ public class WorkflowResource {
         workflowService.resetWorkflow(workflowId);
     }
 
+    @RbacAdminAccess
     @DeleteMapping("/{workflowId}")
     @Operation(summary = "Terminate workflow execution")
     public void terminate(
@@ -222,6 +240,7 @@ public class WorkflowResource {
         workflowService.terminateWorkflow(workflowId, reason);
     }
 
+    @RbacPathVarObject
     @Operation(
             summary = "Search for workflows based on payload and other parameters",
             description =
@@ -237,6 +256,7 @@ public class WorkflowResource {
         return workflowService.searchWorkflows(start, size, sort, freeText, query);
     }
 
+    @RbacPathVarObject
     @Operation(
             summary = "Search for workflows based on payload and other parameters",
             description =
@@ -252,6 +272,7 @@ public class WorkflowResource {
         return workflowService.searchWorkflowsV2(start, size, sort, freeText, query);
     }
 
+    @RbacAdminAccess
     @Operation(
             summary = "Search for workflows based on task parameters",
             description =
@@ -267,6 +288,7 @@ public class WorkflowResource {
         return workflowService.searchWorkflowsByTasks(start, size, sort, freeText, query);
     }
 
+    @RbacAdminAccess
     @Operation(
             summary = "Search for workflows based on task parameters",
             description =

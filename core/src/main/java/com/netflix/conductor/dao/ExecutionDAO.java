@@ -16,6 +16,7 @@ import java.util.List;
 
 import com.netflix.conductor.common.metadata.events.EventExecution;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
+import com.netflix.conductor.common.run.SearchResult;
 import com.netflix.conductor.model.TaskModel;
 import com.netflix.conductor.model.WorkflowModel;
 
@@ -222,4 +223,14 @@ public interface ExecutionDAO {
     default List<WorkflowModel> getWorkflowFamily(String workflowId, boolean summaryOnly) {
         throw new UnsupportedOperationException();
     }
+
+    boolean hasAccess(Object[] args, List<String> labels);
+
+    boolean exists(Object[] args);
+
+    List<String> getUserWorkflowIds(List<String> labels);
+
+    List<String> getPresentIds(List<String> ids);
+
+    SearchResult<String> getSearchResultIds(List<String> roles);
 }
