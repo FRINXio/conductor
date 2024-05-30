@@ -18,7 +18,7 @@ jobs:
           submodules: recursive
 
         name: Set up JDK 17
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -29,7 +29,7 @@ jobs:
   test-v2:
     runs-on: ubuntu-latest
     needs: build-v2
-    
+
     services:
       postgres:
         image: postgres
@@ -50,7 +50,7 @@ jobs:
           submodules: recursive
 
         name: Set up JDK 17
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -74,11 +74,13 @@ jobs:
 
       - name: Create WF
         run: |
-          curl -X 'PUT' \
+          curl -X 'POST' \
             'http://localhost:8080/api/metadata/workflow' \
             -H 'accept: */*' \
             -H 'Content-Type: application/json' \
-            -d '[{
+            -H 'From: admin' \
+            -H 'x-auth-user-groups: network-admin' \
+            -d '{
                   "name": "test",
                   "description": "test workflow",
                   "version": 1,
@@ -113,7 +115,7 @@ jobs:
                     }
                   ],
                   "schemaVersion": 2
-                }]'
+                }'
 
       - name: Execute WF
         run: |
@@ -121,6 +123,8 @@ jobs:
             'http://localhost:8080/api/workflow' \
           -H 'accept: text/plain' \
           -H 'Content-Type: application/json' \
+          -H 'From: admin' \
+          -H 'x-auth-user-groups: network-admin' \
             -d '{
             "name": "test"
             }'
@@ -135,6 +139,8 @@ jobs:
             curl -X 'GET' \
             'http://localhost:8080/api/workflow/search-v2?start=0&size=100&freeText=%2A' \
             -H 'accept: */*' \
+            -H 'From: admin' \
+            -H 'x-auth-user-groups: network-admin' \
             | grep workflowId
 
       - name: Search WFs
@@ -143,6 +149,8 @@ jobs:
           curl -X 'GET' \
           'http://localhost:8080/api/workflow/search-v2?start=0&size=100&freeText=%2A' \
           -H 'accept: */*' \
+          -H 'From: admin' \
+          -H 'x-auth-user-groups: network-admin' \
           | jq
 
       - name: Print Conductor logs
