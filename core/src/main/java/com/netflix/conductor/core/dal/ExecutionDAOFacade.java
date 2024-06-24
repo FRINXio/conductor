@@ -759,6 +759,40 @@ public class ExecutionDAOFacade {
         }
     }
 
+    public boolean hasAccess(Object[] args, List<String> labels) {
+        return executionDAO.hasAccess(args, labels);
+    }
+
+    public boolean exists(Object[] args) {
+        return executionDAO.exists(args);
+    }
+
+    public List<String> getUserWorkflowIds(List<String> labels) {
+        return executionDAO.getUserWorkflowIds(labels);
+    }
+
+    public List<String> getPresentIds(List<String> ids) {
+        return executionDAO.getPresentIds(ids);
+    }
+
+    public SearchResult<String> getSearchResultIds(List<String> roles) {
+        return executionDAO.getSearchResultIds(roles);
+    }
+
+    public SearchResult<WorkflowSummary> getSummaries(SearchResult<String> searchResultIds) {
+        return indexDAO.getSummaries(searchResultIds);
+    }
+
+    public SearchResult<Workflow> getUserWorkflows(SearchResult<String> searchResultIds) {
+        final List<Workflow> workflows =
+                searchResultIds.getResults().stream()
+                        .map(id -> executionDAO.getWorkflow(id, false))
+                        .filter(Objects::nonNull)
+                        .map(WorkflowModel::toWorkflow)
+                        .toList();
+        return new SearchResult<>(workflows.size(), workflows);
+    }
+
     class DelayWorkflowUpdate implements Runnable {
 
         private final String workflowId;

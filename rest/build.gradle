@@ -2,10 +2,14 @@ dependencies {
 
     implementation project(':conductor-common')
     implementation project(':conductor-core')
+    implementation project(':conductor-community:archive')
+    implementation project(':conductor-community:persistence:postgres-persistence')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     implementation "com.netflix.runtime:health-api:${revHealth}"
 
     implementation "org.springdoc:springdoc-openapi-ui:${revOpenapi}"
+
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.1'
 }

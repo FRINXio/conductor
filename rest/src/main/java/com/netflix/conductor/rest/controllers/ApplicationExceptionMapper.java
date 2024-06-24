@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.netflix.conductor.common.validation.ErrorResponse;
 import com.netflix.conductor.core.exception.ConflictException;
@@ -56,6 +57,12 @@ public class ApplicationExceptionMapper {
     public ResponseEntity<ErrorResponse> handleAll(HttpServletRequest request, Throwable th) {
         logException(request, th);
 
+        if (th instanceof HttpClientErrorException httpExc) {
+            ErrorResponse errorResponse =
+                    createUnathorizedErrorResponse(request, httpExc, httpExc.getStatusCode());
+            return new ResponseEntity<>(errorResponse, httpExc.getStatusCode());
+        }
+
         HttpStatus status =
                 EXCEPTION_STATUS_MAP.getOrDefault(th.getClass(), HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -77,5 +84,15 @@ public class ApplicationExceptionMapper {
                 exception.getClass().getSimpleName(),
                 request.getRequestURI(),
                 exception);
+    }
+
+    private ErrorResponse createUnathorizedErrorResponse(
+            HttpServletRequest request, HttpClientErrorException exception, HttpStatus status) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setInstance(request.getServerName());
+        errorResponse.setStatus(status.value());
+        errorResponse.setMessage(exception.getMessage());
+        errorResponse.setRetryable(false);
+        return errorResponse;
     }
 }

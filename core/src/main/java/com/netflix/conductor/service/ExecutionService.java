@@ -611,4 +611,32 @@ public class ExecutionService {
     public List<String> getWorkflowPath(String workflowId) {
         return executionDAOFacade.getWorkflowPath(workflowId);
     }
+
+    public boolean hasAccess(Object[] args, List<String> labels) {
+        return executionDAOFacade.hasAccess(args, labels);
+    }
+
+    public boolean exists(Object[] args) {
+        return executionDAOFacade.exists(args);
+    }
+
+    public List<String> getUserWorkflowIds(List<String> labels) {
+        return executionDAOFacade.getUserWorkflowIds(labels);
+    }
+
+    public List<String> getPresentIds(List<String> ids) {
+        return executionDAOFacade.getPresentIds(ids);
+    }
+
+    public SearchResult<String> getSearchResultIds(List<String> roles) {
+        return executionDAOFacade.getSearchResultIds(roles);
+    }
+
+    public SearchResult<WorkflowSummary> getSummaries(SearchResult<String> searchResultIds) {
+        return executionDAOFacade.getSummaries(searchResultIds);
+    }
+
+    public SearchResult<Workflow> getUserWorkflows(SearchResult<String> searchResultIds) {
+        return executionDAOFacade.getUserWorkflows(searchResultIds);
+    }
 }

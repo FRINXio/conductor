@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.netflix.conductor.common.model.BulkResponse;
+import com.netflix.conductor.rest.rbac.annotations.RbacBulkAccess;
 import com.netflix.conductor.service.WorkflowBulkService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +47,7 @@ public class WorkflowBulkResource {
      * @return bulk response object containing a list of succeeded workflows and a list of failed
      *     ones with errors
      */
+    @RbacBulkAccess
     @PutMapping("/pause")
     @Operation(summary = "Pause the list of workflows")
     public BulkResponse pauseWorkflow(@RequestBody List<String> workflowIds) {
@@ -59,6 +61,7 @@ public class WorkflowBulkResource {
      * @return bulk response object containing a list of succeeded workflows and a list of failed
      *     ones with errors
      */
+    @RbacBulkAccess
     @PutMapping("/resume")
     @Operation(summary = "Resume the list of workflows")
     public BulkResponse resumeWorkflow(@RequestBody List<String> workflowIds) {
@@ -73,6 +76,7 @@ public class WorkflowBulkResource {
      * @return bulk response object containing a list of succeeded workflows and a list of failed
      *     ones with errors
      */
+    @RbacBulkAccess
     @PostMapping("/restart")
     @Operation(summary = "Restart the list of completed workflow")
     public BulkResponse restart(
@@ -89,6 +93,7 @@ public class WorkflowBulkResource {
      * @return bulk response object containing a list of succeeded workflows and a list of failed
      *     ones with errors
      */
+    @RbacBulkAccess
     @PostMapping("/retry")
     @Operation(summary = "Retry the last failed task for each workflow from the list")
     public BulkResponse retry(@RequestBody List<String> workflowIds) {
@@ -104,6 +109,7 @@ public class WorkflowBulkResource {
      * @return bulk response object containing a list of succeeded workflows and a list of failed
      *     ones with errors
      */
+    @RbacBulkAccess
     @PostMapping("/terminate")
     @Operation(summary = "Terminate workflows execution")
     public BulkResponse terminate(

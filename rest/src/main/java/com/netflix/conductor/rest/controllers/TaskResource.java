@@ -32,6 +32,7 @@ import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.common.run.ExternalStorageLocation;
 import com.netflix.conductor.common.run.SearchResult;
 import com.netflix.conductor.common.run.TaskSummary;
+import com.netflix.conductor.rest.rbac.annotations.RbacAdminAccess;
 import com.netflix.conductor.service.TaskService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +51,7 @@ public class TaskResource {
         this.taskService = taskService;
     }
 
+    @RbacAdminAccess
     @GetMapping("/poll/{tasktype}")
     @Operation(summary = "Poll for a task of a certain type")
     public ResponseEntity<Task> poll(
@@ -62,6 +64,7 @@ public class TaskResource {
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    @RbacAdminAccess
     @GetMapping("/poll/batch/{tasktype}")
     @Operation(summary = "Batch poll for a task of a certain type")
     public ResponseEntity<List<Task>> batchPoll(
@@ -77,6 +80,7 @@ public class TaskResource {
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    @RbacAdminAccess
     @PostMapping(produces = TEXT_PLAIN_VALUE)
     @Operation(summary = "Update a task")
     public String updateTask(@RequestBody TaskResult taskResult) {
@@ -95,6 +99,7 @@ public class TaskResource {
         return taskService.getTaskLogs(taskId);
     }
 
+    @RbacAdminAccess
     @GetMapping("/{taskId}")
     @Operation(summary = "Get task by Id")
     public ResponseEntity<Task> getTask(@PathVariable("taskId") String taskId) {
@@ -104,6 +109,7 @@ public class TaskResource {
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    @RbacAdminAccess
     @GetMapping("/queue/sizes")
     @Operation(summary = "Deprecated. Please use /tasks/queue/size endpoint")
     @Deprecated
@@ -112,6 +118,7 @@ public class TaskResource {
         return taskService.getTaskQueueSizes(taskTypes);
     }
 
+    @RbacAdminAccess
     @GetMapping("/queue/size")
     @Operation(summary = "Get queue size for a task type.")
     public Integer taskDepth(
@@ -123,36 +130,42 @@ public class TaskResource {
         return taskService.getTaskQueueSize(taskType, domain, executionNamespace, isolationGroupId);
     }
 
+    @RbacAdminAccess
     @GetMapping("/queue/all/verbose")
     @Operation(summary = "Get the details about each queue")
     public Map<String, Map<String, Map<String, Long>>> allVerbose() {
         return taskService.allVerbose();
     }
 
+    @RbacAdminAccess
     @GetMapping("/queue/all")
     @Operation(summary = "Get the details about each queue")
     public Map<String, Long> all() {
         return taskService.getAllQueueDetails();
     }
 
+    @RbacAdminAccess
     @GetMapping("/queue/polldata")
     @Operation(summary = "Get the last poll data for a given task type")
     public List<PollData> getPollData(@RequestParam("taskType") String taskType) {
         return taskService.getPollData(taskType);
     }
 
+    @RbacAdminAccess
     @GetMapping("/queue/polldata/all")
     @Operation(summary = "Get the last poll data for all task types")
     public List<PollData> getAllPollData() {
         return taskService.getAllPollData();
     }
 
+    @RbacAdminAccess
     @PostMapping(value = "/queue/requeue/{taskType}", produces = TEXT_PLAIN_VALUE)
     @Operation(summary = "Requeue pending tasks")
     public String requeuePendingTask(@PathVariable("taskType") String taskType) {
         return taskService.requeuePendingTask(taskType);
     }
 
+    @RbacAdminAccess
     @Operation(
             summary = "Search for tasks based in payload and other parameters",
             description =
@@ -168,6 +181,7 @@ public class TaskResource {
         return taskService.search(start, size, sort, freeText, query);
     }
 
+    @RbacAdminAccess
     @Operation(
             summary = "Search for tasks based in payload and other parameters",
             description =

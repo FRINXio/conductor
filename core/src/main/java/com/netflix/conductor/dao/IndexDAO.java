@@ -247,4 +247,6 @@ public interface IndexDAO {
      * @return Number of matches for the query
      */
     long getWorkflowCount(String query, String freeText);
+
+    SearchResult<WorkflowSummary> getSummaries(SearchResult<String> searchResultIds);
 }

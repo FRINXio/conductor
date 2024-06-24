@@ -33,6 +33,9 @@ import com.sun.jersey.api.client.filter.ClientFilter;
 public class ClientRequestHandler {
     private final Client client;
 
+    private final String FROM_HEADER = "from";
+    private final String HEADER_VALUE = "test";
+
     public ClientRequestHandler(
             ClientConfig config, ClientHandler handler, ClientFilter... filters) {
         ObjectMapper objectMapper = new ObjectMapperProvider().getObjectMapper();
@@ -60,9 +63,10 @@ public class ClientRequestHandler {
         if (body != null) {
             return client.resource(uri)
                     .type(MediaType.APPLICATION_JSON_TYPE)
+                    .header(FROM_HEADER, HEADER_VALUE)
                     .delete(BulkResponse.class, body);
         } else {
-            client.resource(uri).delete();
+            client.resource(uri).header(FROM_HEADER, HEADER_VALUE).delete();
         }
         return null;
     }
@@ -70,12 +74,14 @@ public class ClientRequestHandler {
     public ClientResponse get(URI uri) {
         return client.resource(uri)
                 .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
+                .header(FROM_HEADER, HEADER_VALUE)
                 .get(ClientResponse.class);
     }
 
     public WebResource.Builder getWebResourceBuilder(URI URI, Object entity) {
         return client.resource(URI)
                 .type(MediaType.APPLICATION_JSON)
+                .header(FROM_HEADER, HEADER_VALUE)
                 .entity(entity)
                 .accept(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON);
     }

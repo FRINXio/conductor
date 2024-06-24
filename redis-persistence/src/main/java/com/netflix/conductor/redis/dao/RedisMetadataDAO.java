@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
+import com.netflix.conductor.common.metadata.BaseDef;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.core.config.ConductorProperties;
@@ -318,6 +319,28 @@ public class RedisMetadataDAO extends BaseDynoDAO implements MetadataDAO {
         }
         recordRedisDaoPayloadSize("getAllWorkflowLatestVersionsDefs", size, "n/a", "n/a");
         return workflows;
+    }
+
+    @Override
+    public boolean hasAccess(Object[] args, List<String> labels, String uri) {
+        throw new UnsupportedOperationException("hasAccess is not supported in RedisMetadataDAO");
+    }
+
+    @Override
+    public boolean exists(Object[] args, String uri) {
+        throw new UnsupportedOperationException("exists is not supported in RedisMetadataDAO");
+    }
+
+    @Override
+    public List<? extends BaseDef> getUserTaskDefs(List<String> roles) {
+        throw new UnsupportedOperationException(
+                "getUserTaskDefs is not supported in RedisMetadataDAO");
+    }
+
+    @Override
+    public List<? extends BaseDef> getUserWorkflowDefs(List<String> roles) {
+        throw new UnsupportedOperationException(
+                "getUserWorkflowDefs is not supported in RedisMetadataDAO");
     }
 
     private void _createOrUpdate(WorkflowDef workflowDef) {
