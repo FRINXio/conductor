@@ -90,7 +90,8 @@ jobs:
             curl -X 'GET' 'http://localhost:8080/health' -H 'accept: */*' | grep '"healthy":true'
 
       - name: Get conductor openapi spec
-        run: curl http://localhost:8080/v3/api-docs -H 'X-Auth-User-Roles: network-admin' -H 'X-Tenant-Id: frinx' -H 'from: frinx-user' -o openapi.json
+        run: |
+          curl http://localhost:8080/v3/api-docs -H "x-auth-user-roles: network-admin" -H "x-tenant-id: frinx" -H "from: frinx-user" -o openapi.json
 
       - name: Check out swagger_docs branch
         uses: actions/checkout@v4
