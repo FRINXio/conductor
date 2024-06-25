@@ -91,7 +91,7 @@ jobs:
 
       - name: Get conductor openapi spec
         run: |
-          curl http://localhost:8080/v3/api-docs -H "x-auth-user-roles: network-admin" -H "x-tenant-id: frinx" -H "from: frinx-user" -o openapi.json
+          curl http://localhost:8080/v3/api-docs -H "x-auth-user-groups: network-admin" -H "x-tenant-id: frinx" -H "from: admin" -o openapi.json
 
       - name: Check out swagger_docs branch
         uses: actions/checkout@v4
