@@ -60,7 +60,7 @@ public class RbacHttpFilter implements Filter {
      * error.
      *
      * @param servletRequest ServletRequest object representing the HTTP request.
-     * @param servletResponse ServletResponse object representing the HTTP response
+     * @param servletResponse ServletResponse object representing the HTTP response.
      * @param filterChain FilterChain object to proceed with the filter chain.
      * @throws IOException IOException if an input or output error occurs while filtering the
      *     request or response.
@@ -73,9 +73,11 @@ public class RbacHttpFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
+        List<String> noRbacValues = List.of("/health", "/v3/api-docs");
 
-        final String healthCheck = "health";
-        if (request.getRequestURI().contains(healthCheck)) {
+        boolean ignoreRbac =
+                noRbacValues.stream().anyMatch(value -> request.getRequestURI().startsWith(value));
+        if (ignoreRbac) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
