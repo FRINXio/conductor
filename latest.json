@@ -3721,13 +3721,13 @@
           "completedWithErrors": {
             "type": "boolean"
           },
-          "startTime": {
-            "type": "integer",
-            "format": "int64"
-          },
           "workflowVersion": {
             "type": "integer",
             "format": "int32"
+          },
+          "startTime": {
+            "type": "integer",
+            "format": "int64"
           },
           "workflowName": {
             "type": "string"
@@ -4016,11 +4016,11 @@
           "parentWorkflowId": {
             "type": "string"
           },
-          "outputSize": {
+          "inputSize": {
             "type": "integer",
             "format": "int64"
           },
-          "inputSize": {
+          "outputSize": {
             "type": "integer",
             "format": "int64"
           }
