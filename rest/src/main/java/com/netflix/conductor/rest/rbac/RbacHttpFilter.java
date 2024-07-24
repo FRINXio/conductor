@@ -73,7 +73,7 @@ public class RbacHttpFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        List<String> noRbacValues = List.of("/health", "/v3/api-docs");
+        List<String> noRbacValues = List.of("/health", "/v3/api-docs", "/actuator/prometheus");
 
         boolean ignoreRbac =
                 noRbacValues.stream().anyMatch(value -> request.getRequestURI().startsWith(value));
