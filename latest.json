@@ -3590,12 +3590,12 @@
           "taskDefinition": {
             "$ref": "#/components/schemas/TaskDef"
           },
-          "loopOverTask": {
-            "type": "boolean"
-          },
           "queueWaitTime": {
             "type": "integer",
             "format": "int64"
+          },
+          "loopOverTask": {
+            "type": "boolean"
           }
         }
       },
@@ -3721,16 +3721,16 @@
           "completedWithErrors": {
             "type": "boolean"
           },
-          "workflowVersion": {
-            "type": "integer",
-            "format": "int32"
-          },
           "startTime": {
             "type": "integer",
             "format": "int64"
           },
           "workflowName": {
             "type": "string"
+          },
+          "workflowVersion": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
