@@ -3590,12 +3590,12 @@
           "taskDefinition": {
             "$ref": "#/components/schemas/TaskDef"
           },
+          "loopOverTask": {
+            "type": "boolean"
+          },
           "queueWaitTime": {
             "type": "integer",
             "format": "int64"
-          },
-          "loopOverTask": {
-            "type": "boolean"
           }
         }
       },
