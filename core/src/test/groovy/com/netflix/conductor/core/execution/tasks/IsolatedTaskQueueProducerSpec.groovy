@@ -14,8 +14,6 @@ package com.netflix.conductor.core.execution.tasks
 
 import java.time.Duration
 
-import org.junit.Test
-
 import com.netflix.conductor.common.metadata.tasks.TaskDef
 import com.netflix.conductor.service.MetadataService
 
@@ -44,7 +42,6 @@ class IsolatedTaskQueueProducerSpec extends Specification {
         isolatedTaskQueueProducer = new IsolatedTaskQueueProducer(metadataService, [asyncSystemTask] as Set, systemTaskWorker, false,
                 Duration.ofSeconds(10))
     }
-
 
     def "addTaskQueuesAddsElementToQueue"() {
         given:

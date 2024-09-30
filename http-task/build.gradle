@@ -16,8 +16,8 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter'
     compileOnly 'org.springframework.boot:spring-boot-starter-web'
 
-    implementation "javax.ws.rs:jsr311-api:${revJsr311Api}"
-    implementation "org.apache.httpcomponents:httpclient:${revHttpCLient}"
+    //implementation "javax.ws.rs:jsr311-api:${revJsr311Api}"   //
+    implementation "org.apache.httpcomponents.client5:httpclient5:${revApacheHttpComponentsClient5}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation "org.testcontainers:mockserver:${revTestContainer}"

@@ -9,7 +9,7 @@ dependencies {
 
     implementation "com.netflix.runtime:health-api:${revHealth}"
 
-    implementation "org.springdoc:springdoc-openapi-ui:${revOpenapi}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${revSpringDoc}"
 
-    implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.1'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
