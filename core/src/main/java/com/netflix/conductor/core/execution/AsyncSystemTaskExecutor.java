@@ -12,12 +12,16 @@
  */
 package com.netflix.conductor.core.execution;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.netflix.conductor.common.metadata.tasks.TaskType;
 import com.netflix.conductor.core.config.ConductorProperties;
 import com.netflix.conductor.core.dal.ExecutionDAOFacade;
+import com.netflix.conductor.core.execution.offset.OffsetEvaluationStrategy;
 import com.netflix.conductor.core.execution.tasks.WorkflowSystemTask;
 import com.netflix.conductor.core.utils.QueueUtils;
 import com.netflix.conductor.dao.MetadataDAO;
@@ -35,6 +39,7 @@ public class AsyncSystemTaskExecutor {
     private final long queueTaskMessagePostponeSecs;
     private final long systemTaskCallbackTime;
     private final WorkflowExecutor workflowExecutor;
+    private final Map<TaskType, OffsetEvaluationStrategy> systemTaskOffsetEvaluation;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncSystemTaskExecutor.class);
 
@@ -52,6 +57,7 @@ public class AsyncSystemTaskExecutor {
                 conductorProperties.getSystemTaskWorkerCallbackDuration().getSeconds();
         this.queueTaskMessagePostponeSecs =
                 conductorProperties.getTaskExecutionPostponeDuration().getSeconds();
+        this.systemTaskOffsetEvaluation = conductorProperties.getSystemTaskOffsetEvaluation();
     }
 
     /**
@@ -164,12 +170,15 @@ public class AsyncSystemTaskExecutor {
                 hasTaskExecutionCompleted = true;
                 LOGGER.debug("{} removed from queue: {}", task, queueName);
             } else {
-                task.setCallbackAfterSeconds(systemTaskCallbackTime);
-                systemTask
-                        .getEvaluationOffset(task, systemTaskCallbackTime)
-                        .ifPresentOrElse(
-                                task::setCallbackAfterSeconds,
-                                () -> task.setCallbackAfterSeconds(systemTaskCallbackTime));
+                final long callbackAfterSeconds =
+                        systemTaskOffsetEvaluation
+                                .getOrDefault(
+                                        TaskType.of(task.getTaskType()),
+                                        OffsetEvaluationStrategy.CONSTANT_DEFAULT_OFFSET)
+                                .getTaskOffsetEvaluation()
+                                .computeEvaluationOffset(
+                                        task, systemTaskCallbackTime, queueDAO.getSize(queueName));
+                task.setCallbackAfterSeconds(callbackAfterSeconds);
                 queueDAO.postpone(
                         queueName,
                         task.getTaskId(),

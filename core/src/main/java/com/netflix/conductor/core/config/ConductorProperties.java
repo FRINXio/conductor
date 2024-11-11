@@ -24,6 +24,9 @@ import org.springframework.boot.convert.DurationUnit;
 import org.springframework.util.unit.DataSize;
 import org.springframework.util.unit.DataUnit;
 
+import com.netflix.conductor.common.metadata.tasks.TaskType;
+import com.netflix.conductor.core.execution.offset.OffsetEvaluationStrategy;
+
 @ConfigurationProperties("conductor.app")
 public class ConductorProperties {
 
@@ -96,6 +99,15 @@ public class ConductorProperties {
      */
     @DurationUnit(ChronoUnit.SECONDS)
     private Duration systemTaskWorkerCallbackDuration = Duration.ofSeconds(30);
+
+    /**
+     * The strategy to be used for evaluation of the offset for a postponed system task of certain
+     * type.<br>
+     * Tasks that are not listed here use {@link
+     * ConductorProperties#systemTaskWorkerCallbackDuration} value.
+     */
+    private Map<TaskType, OffsetEvaluationStrategy> systemTaskOffsetEvaluation =
+            Map.of(TaskType.JOIN, OffsetEvaluationStrategy.BACKOFF_TO_DEFAULT_OFFSET);
 
     /**
      * The interval (in milliseconds) at which system task queues will be polled by the system task
@@ -351,6 +363,15 @@ public class ConductorProperties {
 
     public Duration getSystemTaskWorkerCallbackDuration() {
         return systemTaskWorkerCallbackDuration;
+    }
+
+    public void setSystemTaskOffsetEvaluation(
+            final Map<TaskType, OffsetEvaluationStrategy> systemTaskOffsetEvaluation) {
+        this.systemTaskOffsetEvaluation = systemTaskOffsetEvaluation;
+    }
+
+    public Map<TaskType, OffsetEvaluationStrategy> getSystemTaskOffsetEvaluation() {
+        return systemTaskOffsetEvaluation;
     }
 
     public void setSystemTaskWorkerCallbackDuration(Duration systemTaskWorkerCallbackDuration) {
