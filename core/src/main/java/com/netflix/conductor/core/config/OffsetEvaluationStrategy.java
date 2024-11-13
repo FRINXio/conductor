@@ -10,48 +10,25 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package com.netflix.conductor.core.execution.offset;
+package com.netflix.conductor.core.config;
 
 /**
  * Strategies used for computation of the task offset. The offset is used to postpone the task
  * execution in the queue.
  */
 public enum OffsetEvaluationStrategy {
-    /**
-     * Constant offset evaluation strategy - using default offset value.
-     *
-     * @see ConstantDefaultOffsetEvaluation
-     */
-    CONSTANT_DEFAULT_OFFSET(new ConstantDefaultOffsetEvaluation()),
+    /** Constant offset evaluation strategy - using default offset value. */
+    CONSTANT_DEFAULT_OFFSET,
     /**
      * Computes the evaluation offset for a postponed task based on the task's poll count and a
      * default offset. In this strategy offset increases exponentially until it reaches the default
      * offset.
-     *
-     * @see BackoffToDefaultOffsetEvaluation
      */
-    BACKOFF_TO_DEFAULT_OFFSET(new BackoffToDefaultOffsetEvaluation()),
+    BACKOFF_TO_DEFAULT_OFFSET,
     /**
      * Computes the evaluation offset for a postponed task based on the queue size and the task's
      * poll count. In this strategy offset increases exponentially until it reaches the (default
      * offset * queue size) value.
-     *
-     * @see ScaledByQueueSizeOffsetEvaluation
      */
-    SCALED_BY_QUEUE_SIZE(new ScaledByQueueSizeOffsetEvaluation());
-
-    private final TaskOffsetEvaluation taskOffsetEvaluation;
-
-    OffsetEvaluationStrategy(final TaskOffsetEvaluation taskOffsetEvaluation) {
-        this.taskOffsetEvaluation = taskOffsetEvaluation;
-    }
-
-    /**
-     * Get the task offset evaluation strategy.
-     *
-     * @return {@link TaskOffsetEvaluation}
-     */
-    public TaskOffsetEvaluation getTaskOffsetEvaluation() {
-        return taskOffsetEvaluation;
-    }
+    SCALED_BY_QUEUE_SIZE;
 }

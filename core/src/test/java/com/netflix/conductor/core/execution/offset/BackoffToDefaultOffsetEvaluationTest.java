@@ -12,14 +12,15 @@
  */
 package com.netflix.conductor.core.execution.offset;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import java.time.Duration;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.netflix.conductor.core.config.ConductorProperties;
 import com.netflix.conductor.model.TaskModel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,26 +28,19 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BackoffToDefaultOffsetEvaluationTest {
-    private static TaskOffsetEvaluation offsetEvaluation;
-
-    @BeforeAll
-    static void setUp() {
-        offsetEvaluation = new BackoffToDefaultOffsetEvaluation();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        offsetEvaluation = null;
-    }
 
     @Mock private TaskModel taskModel;
+    @Mock private ConductorProperties conductorProperties;
 
     @ParameterizedTest
     @CsvSource({"0, 5, 0", "1, 5, 0", "2, 5, 2", "3, 5, 4", "4, 5, 5", "4, 10, 8", "5, 10, 10"})
     void testComputeEvaluationOffset(
             final int pollCount, final long defaultOffset, final long expectedOffset) {
+        when(conductorProperties.getSystemTaskWorkerCallbackDuration())
+                .thenReturn(Duration.ofSeconds(defaultOffset));
+        final var offsetEvaluation = new BackoffToDefaultOffsetEvaluation(conductorProperties);
         when(taskModel.getPollCount()).thenReturn(pollCount);
-        final var result = offsetEvaluation.computeEvaluationOffset(taskModel, defaultOffset, 10);
+        final var result = offsetEvaluation.computeEvaluationOffset(taskModel, 10);
         assertEquals(expectedOffset, result);
     }
 }
