@@ -12,6 +12,10 @@
  */
 package com.netflix.conductor.core.execution.offset;
 
+import org.springframework.stereotype.Component;
+
+import com.netflix.conductor.core.config.ConductorProperties;
+import com.netflix.conductor.core.config.OffsetEvaluationStrategy;
 import com.netflix.conductor.model.TaskModel;
 
 /**
@@ -31,11 +35,22 @@ import com.netflix.conductor.model.TaskModel;
  * <tr><td>5</td><td>10</td><td>10</td></tr>
  * </table>
  */
+@Component
 final class BackoffToDefaultOffsetEvaluation implements TaskOffsetEvaluation {
 
+    private final long defaultOffset;
+
+    BackoffToDefaultOffsetEvaluation(final ConductorProperties conductorProperties) {
+        defaultOffset = conductorProperties.getSystemTaskWorkerCallbackDuration().toSeconds();
+    }
+
     @Override
-    public long computeEvaluationOffset(
-            final TaskModel taskModel, final long defaultOffset, final int queueSize) {
+    public OffsetEvaluationStrategy type() {
+        return OffsetEvaluationStrategy.BACKOFF_TO_DEFAULT_OFFSET;
+    }
+
+    @Override
+    public long computeEvaluationOffset(final TaskModel taskModel, final int queueSize) {
         final int index = taskModel.getPollCount() > 0 ? taskModel.getPollCount() - 1 : 0;
         if (index == 0) {
             return 0L;

@@ -12,20 +12,24 @@
  */
 package com.netflix.conductor.core.execution.offset;
 
+import com.netflix.conductor.core.config.OffsetEvaluationStrategy;
 import com.netflix.conductor.model.TaskModel;
 
 /** Service used for computation of the evaluation offset for the postponed task. */
-public sealed interface TaskOffsetEvaluation
-        permits BackoffToDefaultOffsetEvaluation,
-                ConstantDefaultOffsetEvaluation,
-                ScaledByQueueSizeOffsetEvaluation {
+public interface TaskOffsetEvaluation {
+    /**
+     * Get the type of the offset evaluation strategy.
+     *
+     * @return @{@link OffsetEvaluationStrategy}
+     */
+    OffsetEvaluationStrategy type();
+
     /**
      * Compute the evaluation offset for the postponed task.
      *
      * @param taskModel details about the postponed task
-     * @param defaultOffset the default offset provided by the configuration properties [seconds]
      * @param queueSize the actual size of the queue before the task is postponed
      * @return the computed evaluation offset [seconds]
      */
-    long computeEvaluationOffset(TaskModel taskModel, long defaultOffset, int queueSize);
+    long computeEvaluationOffset(TaskModel taskModel, int queueSize);
 }

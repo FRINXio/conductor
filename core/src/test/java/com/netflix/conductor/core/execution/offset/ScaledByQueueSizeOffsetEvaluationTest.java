@@ -12,14 +12,15 @@
  */
 package com.netflix.conductor.core.execution.offset;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import java.time.Duration;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.netflix.conductor.core.config.ConductorProperties;
 import com.netflix.conductor.model.TaskModel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,19 +29,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ScaledByQueueSizeOffsetEvaluationTest {
 
-    private static TaskOffsetEvaluation offsetEvaluation;
-
-    @BeforeAll
-    static void setUp() {
-        offsetEvaluation = new ScaledByQueueSizeOffsetEvaluation();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        offsetEvaluation = null;
-    }
-
     @Mock private TaskModel taskModel;
+    @Mock private ConductorProperties conductorProperties;
 
     @ParameterizedTest
     @CsvSource({
@@ -57,9 +47,11 @@ class ScaledByQueueSizeOffsetEvaluationTest {
             final long defaultOffset,
             final int queueSize,
             final long expectedOffset) {
+        when(conductorProperties.getSystemTaskWorkerCallbackDuration())
+                .thenReturn(Duration.ofSeconds(defaultOffset));
+        final var offsetEvaluation = new ScaledByQueueSizeOffsetEvaluation(conductorProperties);
         when(taskModel.getPollCount()).thenReturn(pollCount);
-        final var result =
-                offsetEvaluation.computeEvaluationOffset(taskModel, defaultOffset, queueSize);
+        final var result = offsetEvaluation.computeEvaluationOffset(taskModel, queueSize);
         assertEquals(expectedOffset, result);
     }
 }

@@ -16,7 +16,10 @@ import java.time.Duration
 
 import com.netflix.conductor.common.metadata.tasks.TaskDef
 import com.netflix.conductor.core.config.ConductorProperties
+import com.netflix.conductor.core.config.OffsetEvaluationStrategy
 import com.netflix.conductor.core.dal.ExecutionDAOFacade
+import com.netflix.conductor.core.execution.offset.TaskOffsetEvaluation
+import com.netflix.conductor.core.execution.offset.TaskOffsetEvaluationSelector
 import com.netflix.conductor.core.execution.tasks.SubWorkflow
 import com.netflix.conductor.core.execution.tasks.WorkflowSystemTask
 import com.netflix.conductor.core.operation.StartWorkflowOperation
@@ -61,7 +64,25 @@ class AsyncSystemTaskExecutorTest extends Specification {
         properties.taskExecutionPostponeDuration = Duration.ofSeconds(1)
         properties.systemTaskWorkerCallbackDuration = Duration.ofSeconds(1)
 
-        executor = new AsyncSystemTaskExecutor(executionDAOFacade, queueDAO, metadataDAO, properties, workflowExecutor)
+        def offsetEvaluationStrategySelector = createTaskOffsetEvaluationSelector(
+                properties.systemTaskWorkerCallbackDuration.toSeconds())
+        executor = new AsyncSystemTaskExecutor(executionDAOFacade, queueDAO, metadataDAO,
+                offsetEvaluationStrategySelector, properties, workflowExecutor)
+    }
+
+    private static TaskOffsetEvaluationSelector createTaskOffsetEvaluationSelector(final long offset) {
+        def offsetEvaluation = new TaskOffsetEvaluation() {
+            @Override
+            OffsetEvaluationStrategy type() {
+                return OffsetEvaluationStrategy.CONSTANT_DEFAULT_OFFSET
+            }
+
+            @Override
+            long computeEvaluationOffset(final TaskModel taskModel, final int queueSize) {
+                return offset
+            }
+        }
+        return new TaskOffsetEvaluationSelector(List.of(offsetEvaluation))
     }
 
     // this is not strictly a unit test, but its essential to test AsyncSystemTaskExecutor with SubWorkflow
@@ -238,8 +259,6 @@ class AsyncSystemTaskExecutorTest extends Specification {
                 taskDefName: "taskDefName", workflowPriority: 10)
         WorkflowModel workflow = new WorkflowModel(workflowId: workflowId, status: WorkflowModel.Status.RUNNING)
         String queueName = QueueUtils.getQueueName(task)
-        workflowSystemTask.getEvaluationOffset(task, 1) >> Optional.empty();
-
 
         when:
         executor.execute(workflowSystemTask, taskId)

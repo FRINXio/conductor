@@ -25,7 +25,6 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.util.unit.DataUnit;
 
 import com.netflix.conductor.common.metadata.tasks.TaskType;
-import com.netflix.conductor.core.execution.offset.OffsetEvaluationStrategy;
 
 @ConfigurationProperties("conductor.app")
 public class ConductorProperties {

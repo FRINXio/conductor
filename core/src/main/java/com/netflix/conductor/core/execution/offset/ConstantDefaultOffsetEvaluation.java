@@ -12,13 +12,29 @@
  */
 package com.netflix.conductor.core.execution.offset;
 
+import org.springframework.stereotype.Component;
+
+import com.netflix.conductor.core.config.ConductorProperties;
+import com.netflix.conductor.core.config.OffsetEvaluationStrategy;
 import com.netflix.conductor.model.TaskModel;
 
 /** Dummy implementation of {@link TaskOffsetEvaluation} that always returns the default offset. */
+@Component
 final class ConstantDefaultOffsetEvaluation implements TaskOffsetEvaluation {
+
+    private final long defaultOffset;
+
+    ConstantDefaultOffsetEvaluation(final ConductorProperties conductorProperties) {
+        defaultOffset = conductorProperties.getSystemTaskWorkerCallbackDuration().toSeconds();
+    }
+
     @Override
-    public long computeEvaluationOffset(
-            final TaskModel taskModel, final long defaultOffset, final int queueSize) {
+    public OffsetEvaluationStrategy type() {
+        return OffsetEvaluationStrategy.CONSTANT_DEFAULT_OFFSET;
+    }
+
+    @Override
+    public long computeEvaluationOffset(final TaskModel taskModel, final int queueSize) {
         return defaultOffset;
     }
 }
