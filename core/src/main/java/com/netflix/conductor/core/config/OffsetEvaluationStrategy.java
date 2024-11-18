@@ -30,5 +30,13 @@ public enum OffsetEvaluationStrategy {
      * poll count. In this strategy offset increases exponentially until it reaches the (default
      * offset * queue size) value.
      */
-    SCALED_BY_QUEUE_SIZE;
+    SCALED_BY_QUEUE_SIZE,
+    /**
+     * Computes the evaluation offset for a postponed task based on the task's duration. In this
+     * strategy offset increases by steps that are proportional to the task's duration and defined
+     * by the user settings.
+     *
+     * @see ConductorProperties#getTaskDurationToOffsetSteps() setting used to define the steps
+     */
+    SCALED_BY_TASK_DURATION
 }

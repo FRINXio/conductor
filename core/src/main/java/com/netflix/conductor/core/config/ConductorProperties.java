@@ -14,6 +14,7 @@ package com.netflix.conductor.core.config;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -107,6 +108,24 @@ public class ConductorProperties {
      */
     private Map<TaskType, OffsetEvaluationStrategy> systemTaskOffsetEvaluation =
             Map.of(TaskType.JOIN, OffsetEvaluationStrategy.BACKOFF_TO_DEFAULT_OFFSET);
+
+    /**
+     * The duration of the task execution mapped to the calculated offset of the postponed task
+     * [seconds].<br>
+     * This setting is used only by the {@link OffsetEvaluationStrategy#SCALED_BY_TASK_DURATION}
+     * offset evaluation strategy.<br>
+     * Example: If map contains two entries (10, 30) and (20, 60), then the evaluation offsets for
+     * the postponed tasks in the queue will be calculated according to the following intervals:
+     *
+     * <ul>
+     *   <li><0,10) seconds: offset = 0 seconds
+     *   <li><10-20) seconds: offset = 30 seconds
+     *   <li><20-N) seconds: offset = 60 seconds
+     * </ul>
+     *
+     * By default, the offset is always set to 0 seconds.
+     */
+    private Map<Long, Long> taskDurationToOffsetSteps = Collections.emptyMap();
 
     /**
      * The interval (in milliseconds) at which system task queues will be polled by the system task
@@ -371,6 +390,14 @@ public class ConductorProperties {
 
     public Map<TaskType, OffsetEvaluationStrategy> getSystemTaskOffsetEvaluation() {
         return systemTaskOffsetEvaluation;
+    }
+
+    public Map<Long, Long> getTaskDurationToOffsetSteps() {
+        return taskDurationToOffsetSteps;
+    }
+
+    public void setTaskDurationToOffsetSteps(Map<Long, Long> taskDurationToOffsetSteps) {
+        this.taskDurationToOffsetSteps = taskDurationToOffsetSteps;
     }
 
     public void setSystemTaskWorkerCallbackDuration(Duration systemTaskWorkerCallbackDuration) {
