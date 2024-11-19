@@ -114,13 +114,13 @@ public class ConductorProperties {
      * [seconds].<br>
      * This setting is used only by the {@link OffsetEvaluationStrategy#SCALED_BY_TASK_DURATION}
      * offset evaluation strategy.<br>
-     * Example: If map contains two entries (10, 30) and (20, 60), then the evaluation offsets for
-     * the postponed tasks in the queue will be calculated according to the following intervals:
+     * Example: If settings contain two entries (10, 30) and (20, 60), then the evaluation offsets
+     * for the postponed tasks in the queue will be calculated according to the following intervals:
      *
      * <ul>
      *   <li><0,10) seconds: offset = 0 seconds
-     *   <li><10-20) seconds: offset = 30 seconds
-     *   <li><20-N) seconds: offset = 60 seconds
+     *   <li><10,20) seconds: offset = 30 seconds
+     *   <li><20,N) seconds: offset = 60 seconds
      * </ul>
      *
      * By default, the offset is always set to 0 seconds.
