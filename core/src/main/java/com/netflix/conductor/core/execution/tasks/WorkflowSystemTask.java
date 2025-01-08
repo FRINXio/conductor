@@ -65,10 +65,6 @@ public abstract class WorkflowSystemTask {
      */
     public void cancel(WorkflowModel workflow, TaskModel task, WorkflowExecutor workflowExecutor) {}
 
-    public Optional<Long> getEvaluationOffset(TaskModel taskModel, long defaultOffset) {
-        return Optional.empty();
-    }
-
     /**
      * @return True if the task is supposed to be started asynchronously using internal queues.
      */

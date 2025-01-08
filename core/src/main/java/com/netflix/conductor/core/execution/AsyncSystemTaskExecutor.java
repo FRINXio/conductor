@@ -12,12 +12,17 @@
  */
 package com.netflix.conductor.core.execution;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.netflix.conductor.common.metadata.tasks.TaskType;
 import com.netflix.conductor.core.config.ConductorProperties;
+import com.netflix.conductor.core.config.OffsetEvaluationStrategy;
 import com.netflix.conductor.core.dal.ExecutionDAOFacade;
+import com.netflix.conductor.core.execution.offset.TaskOffsetEvaluationSelector;
 import com.netflix.conductor.core.execution.tasks.WorkflowSystemTask;
 import com.netflix.conductor.core.utils.QueueUtils;
 import com.netflix.conductor.dao.MetadataDAO;
@@ -33,8 +38,9 @@ public class AsyncSystemTaskExecutor {
     private final QueueDAO queueDAO;
     private final MetadataDAO metadataDAO;
     private final long queueTaskMessagePostponeSecs;
-    private final long systemTaskCallbackTime;
+    private final TaskOffsetEvaluationSelector taskOffsetEvaluationSelector;
     private final WorkflowExecutor workflowExecutor;
+    private final Map<TaskType, OffsetEvaluationStrategy> systemTaskOffsetEvaluation;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncSystemTaskExecutor.class);
 
@@ -42,16 +48,17 @@ public class AsyncSystemTaskExecutor {
             ExecutionDAOFacade executionDAOFacade,
             QueueDAO queueDAO,
             MetadataDAO metadataDAO,
+            TaskOffsetEvaluationSelector taskOffsetEvaluationSelector,
             ConductorProperties conductorProperties,
             WorkflowExecutor workflowExecutor) {
         this.executionDAOFacade = executionDAOFacade;
         this.queueDAO = queueDAO;
         this.metadataDAO = metadataDAO;
+        this.taskOffsetEvaluationSelector = taskOffsetEvaluationSelector;
         this.workflowExecutor = workflowExecutor;
-        this.systemTaskCallbackTime =
-                conductorProperties.getSystemTaskWorkerCallbackDuration().getSeconds();
         this.queueTaskMessagePostponeSecs =
                 conductorProperties.getTaskExecutionPostponeDuration().getSeconds();
+        this.systemTaskOffsetEvaluation = conductorProperties.getSystemTaskOffsetEvaluation();
     }
 
     /**
@@ -164,12 +171,15 @@ public class AsyncSystemTaskExecutor {
                 hasTaskExecutionCompleted = true;
                 LOGGER.debug("{} removed from queue: {}", task, queueName);
             } else {
-                task.setCallbackAfterSeconds(systemTaskCallbackTime);
-                systemTask
-                        .getEvaluationOffset(task, systemTaskCallbackTime)
-                        .ifPresentOrElse(
-                                task::setCallbackAfterSeconds,
-                                () -> task.setCallbackAfterSeconds(systemTaskCallbackTime));
+                final var evaluationStrategy =
+                        systemTaskOffsetEvaluation.getOrDefault(
+                                TaskType.of(task.getTaskType()),
+                                OffsetEvaluationStrategy.CONSTANT_DEFAULT_OFFSET);
+                final var callbackAfterSeconds =
+                        taskOffsetEvaluationSelector
+                                .taskOffsetEvaluation(evaluationStrategy)
+                                .computeEvaluationOffset(task, queueDAO.getSize(queueName));
+                task.setCallbackAfterSeconds(callbackAfterSeconds);
                 queueDAO.postpone(
                         queueName,
                         task.getTaskId(),
